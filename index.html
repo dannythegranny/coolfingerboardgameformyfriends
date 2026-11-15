@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fingerboard Park — The Workshop</title>
+<style>
+:root{color-scheme:light}
+html,body{margin:0;height:100%;background:#d8d5cf;overflow:hidden;font-family:'DM Sans',system-ui,sans-serif;color:#f4f1eb;-webkit-user-select:none;user-select:none}
+canvas{display:block;outline:none}
+.h{position:fixed;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+#sc{left:16px;top:14px;min-width:105px;padding:9px 14px 11px;border:1px solid rgba(255,255,255,.16);border-radius:7px;background:rgba(39,35,30,.78);backdrop-filter:blur(7px);font:700 29px/1.05 'DM Sans',sans-serif;box-shadow:0 3px 12px rgba(0,0,0,.18)}
+#sc small{display:block;margin-bottom:5px;font:700 11px 'DM Sans';letter-spacing:1.8px;opacity:.8}
+#cash{left:153px;top:14px;min-width:112px;padding:9px 13px 10px;border:1px solid rgba(255,255,255,.18);border-radius:7px;background:rgba(49,58,43,.84);backdrop-filter:blur(7px);font:700 26px/1.05 'DM Sans',sans-serif;box-shadow:0 3px 12px rgba(0,0,0,.18)}
+#cash small{display:block;margin-bottom:5px;font:700 11px 'DM Sans';letter-spacing:1.8px;opacity:.84}
+#cash span{color:#d6edaa}
+#mult{position:fixed;left:310px;right:280px;top:57px;text-align:center;color:#f4f1eb;font:700 11px 'DM Sans';letter-spacing:1.1px;text-shadow:0 1px 3px rgba(0,0,0,.55)}
+#mult span{display:inline-block;margin-left:7px;color:#f4d58d;font:700 19px 'DM Sans';letter-spacing:0}
+#mult small{display:block;margin-top:2px;font:500 9px 'DM Sans';letter-spacing:.8px;opacity:.78}
+#spd{left:16px;top:91px;padding:8px 12px;border:1px solid rgba(255,255,255,.24);border-radius:12px;background:rgba(39,35,30,.68);font:700 12px 'DM Sans';letter-spacing:1px}
+#spd span{font:400 20px 'Bowlby One';margin-left:7px;letter-spacing:0}
+#gs{left:16px;top:143px;padding:8px 12px;border:1px solid rgba(255,255,255,.24);border-radius:12px;background:rgba(39,35,30,.68);font:700 11px 'DM Sans';letter-spacing:1px}
+#gs span{display:block;margin-top:3px;color:#e4c48b;font:700 14px 'DM Sans';letter-spacing:.2px}
+#railStatus{left:16px;top:199px;padding:8px 12px;border:1px solid rgba(255,255,255,.16);border-radius:7px;background:rgba(39,35,30,.68);font:700 10px 'DM Sans';letter-spacing:1px}
+#railStatus span{display:block;margin-top:3px;color:#c2d0b5;font:700 12px 'DM Sans';letter-spacing:.3px}
+#cb{left:310px;right:280px;top:20px;text-align:center;font:700 18px 'DM Sans';min-height:24px}
+#ts{left:0;right:0;top:24%;text-align:center;font:700 clamp(24px,4vw,34px) 'DM Sans',sans-serif;opacity:0;transition:opacity .25s;letter-spacing:.2px}
+#ctl{display:none}
+#tl{right:14px;top:14px;width:232px;max-height:calc(100vh - 28px);box-sizing:border-box;overflow-y:auto;pointer-events:auto;background:rgba(45,41,36,.88);border:1px solid rgba(255,255,255,.22);border-radius:8px;padding:11px 10px 10px;text-shadow:none;backdrop-filter:blur(5px);box-shadow:0 3px 12px rgba(0,0,0,.16);scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.4) transparent}
+#tl strong{display:block;padding:2px 8px 8px;font:700 13px 'DM Sans';letter-spacing:1.1px;color:#d8c7a8}
+#tl ol{list-style:none;margin:0;padding:0}
+#tl li{display:flex;align-items:center;gap:4px;font:700 12px/1.65 'DM Sans',sans-serif;padding:2px 7px;border-radius:7px;white-space:nowrap}
+#tl li span{margin-left:5px}
+#tl li.on{background:#c4a675;color:#30281e;text-shadow:none;box-shadow:inset 3px 0 #5b4129}
+#tl li.gon{background:#8a9d7c;color:#1f2b1d;text-shadow:none;box-shadow:inset 3px 0 #445b3f}
+#tl .subhead{display:block;margin:12px 7px 5px;padding-top:9px;border-top:1px solid rgba(255,255,255,.2);font:700 12px 'DM Sans';letter-spacing:.8px;color:#b8c8b2}
+#tl li kbd{min-width:18px;text-align:center}
+#tl p{margin:8px 5px 0;padding-top:7px;border-top:1px solid rgba(255,255,255,.16);font:500 11px/1.45 'DM Sans',sans-serif;opacity:.88;max-width:220px}
+#st{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(48,45,41,.62);backdrop-filter:blur(3px);text-align:center;padding:20px;cursor:pointer}
+#st h1{font:700 clamp(36px,8vw,68px)/1 'DM Sans',sans-serif;margin:0 0 14px;color:#f6f0e7;text-shadow:0 2px 4px rgba(0,0,0,.42);letter-spacing:.4px}
+#st p{margin:5px 0;font-size:16px;max-width:56ch;line-height:1.5}
+#st .start{margin-top:14px;padding:10px 22px;border:1px solid #b5a17f;border-radius:5px;background:#c8ad7b;color:#2f291f;font-weight:700;box-shadow:0 2px 0 #8d7650;text-shadow:none}
+kbd{display:inline-block;background:#e8e2d8;color:#28241f;border-radius:3px;padding:1px 5px;font:700 11px 'DM Sans';box-shadow:0 1px 0 rgba(0,0,0,.15)}
+#tm{left:50%;bottom:calc(27px + env(safe-area-inset-bottom,0px));width:250px;height:12px;margin-left:-125px;border:1px solid rgba(60,50,40,.55);box-sizing:border-box;border-radius:3px;opacity:0;overflow:hidden;background:linear-gradient(90deg,rgba(230,220,205,.3) 0 50%,rgba(119,153,112,.65) 50% 86.7%,rgba(166,85,70,.6) 86.7% 100%);box-shadow:0 2px 8px rgba(0,0,0,.18)}
+#tf{height:100%;width:0;background:#fff;border-radius:8px;box-shadow:0 0 8px rgba(255,255,255,.8)}
+
+#shopBtn{position:fixed;z-index:8;left:16px;bottom:18px;border:1px solid rgba(255,255,255,.32);border-radius:7px;padding:11px 16px;background:#3b3329;color:#f6eddd;font:700 13px 'DM Sans';letter-spacing:.8px;box-shadow:0 3px 12px rgba(0,0,0,.28);cursor:pointer;pointer-events:auto}
+#shopBtn:hover{background:#594a38}
+#shopPanel{position:fixed;z-index:30;inset:3.5vh 3.5vw;display:none;flex-direction:column;min-height:0;background:rgba(36,33,29,.97);color:#f2eee6;border:1px solid rgba(255,255,255,.22);border-radius:12px;box-shadow:0 16px 60px rgba(0,0,0,.48);backdrop-filter:blur(12px);pointer-events:auto;text-shadow:none;overflow:hidden}
+#shopHeader{display:flex;align-items:center;gap:18px;padding:16px 19px;border-bottom:1px solid rgba(255,255,255,.15);flex-wrap:wrap}
+#shopHeader h2{margin:0;font:700 23px 'DM Sans';letter-spacing:.4px}
+#shopHeader p{margin:4px 0 0;color:#c8c0b2;font:500 12px 'DM Sans'}
+#shopStats{margin-left:auto;color:#e5d2aa;font:700 13px 'DM Sans';text-align:right}
+#shopClose{border:1px solid rgba(255,255,255,.2);border-radius:7px;background:#574b3c;color:#fff;font:700 19px 'DM Sans';width:38px;height:36px;cursor:pointer}
+#shopGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:11px;padding:15px;overflow:auto;min-height:0;scrollbar-width:thin;scrollbar-color:#8d806c transparent}
+.boardCard{display:flex;flex-direction:column;gap:7px;min-height:180px;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:9px;background:linear-gradient(155deg,rgba(255,255,255,.075),rgba(0,0,0,.16));}
+.boardPreview{height:53px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.miniWheel{width:calc(13px * var(--wheel-scale,1));height:calc(21px * var(--wheel-scale,1));border-radius:5px;background:var(--wheel);border:1px solid rgba(255,255,255,.55);box-shadow:0 2px 3px rgba(0,0,0,.35);z-index:1}
+.miniDeck{width:105px;height:30px;border-radius:50% / 42%;border:2px solid #d9d2c6;box-shadow:0 3px 5px rgba(0,0,0,.4),inset 0 0 0 1px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;transform:rotate(-7deg);color:white;font:700 10px 'DM Sans';letter-spacing:1px;text-shadow:0 1px 2px rgba(0,0,0,.85);position:relative}
+.boardName{font:700 14px 'DM Sans';color:#f4ead9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.boardMeta{font:500 10px/1.5 'DM Sans';color:#c8c0b2;min-height:30px}
+.boardPrice{font:700 12px 'DM Sans';color:#ead09a;margin-top:auto}
+.boardCard button{border:1px solid rgba(255,255,255,.18);border-radius:6px;background:#ba9b69;color:#2a241c;padding:8px 6px;font:700 11px 'DM Sans';letter-spacing:.4px;cursor:pointer}
+.boardCard button:disabled{background:#59634f;color:#e3eadc;cursor:default}
+.boardCard button.cant{background:#55483a;color:#cfc6b9}
+.shopFoot{padding:8px 16px;border-top:1px solid rgba(255,255,255,.12);font:500 10px 'DM Sans';color:#bcb3a4}
+
+#parkShopBtn{position:fixed;z-index:8;left:174px;bottom:18px;border:1px solid rgba(255,255,255,.32);border-radius:7px;padding:11px 16px;background:#454e50;color:#f6eddd;font:700 13px 'DM Sans';letter-spacing:.8px;box-shadow:0 3px 12px rgba(0,0,0,.28);cursor:pointer;pointer-events:auto}
+#parkShopBtn:hover{background:#5d6b6c}
+#parkShopPanel{position:fixed;z-index:31;inset:3.5vh 3.5vw;display:none;flex-direction:column;min-height:0;background:rgba(34,35,33,.98);color:#f2eee6;border:1px solid rgba(255,255,255,.22);border-radius:12px;box-shadow:0 16px 60px rgba(0,0,0,.5);backdrop-filter:blur(12px);pointer-events:auto;text-shadow:none;overflow:hidden}
+#parkShopHeader{display:flex;align-items:center;gap:18px;padding:16px 19px;border-bottom:1px solid rgba(255,255,255,.15);flex-wrap:wrap}
+#parkShopHeader h2{margin:0;font:700 23px 'DM Sans';letter-spacing:.4px}
+#parkShopHeader p{margin:4px 0 0;color:#c8c0b2;font:500 12px 'DM Sans'}
+#parkShopStats{margin-left:auto;color:#e5d2aa;font:700 13px 'DM Sans';text-align:right}
+#parkShopClose{border:1px solid rgba(255,255,255,.2);border-radius:7px;background:#574b3c;color:#fff;font:700 19px 'DM Sans';width:38px;height:36px;cursor:pointer}
+#parkShopGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;padding:15px;overflow:auto;min-height:0;scrollbar-width:thin;scrollbar-color:#8d806c transparent}
+.parkCard{display:flex;flex-direction:column;gap:8px;min-height:245px;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:9px;background:linear-gradient(155deg,rgba(255,255,255,.075),rgba(0,0,0,.18))}
+.parkThumb{height:104px;border-radius:6px;position:relative;overflow:hidden;background:linear-gradient(150deg,#b99769,#8d6e48);border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.parkThumb:before{content:'';position:absolute;inset:8px;background:repeating-linear-gradient(0deg,rgba(255,255,255,.07) 0 2px,transparent 2px 13px);border:1px solid rgba(54,40,25,.36);transform:skewY(-8deg)}
+.parkThumb .feature{position:absolute;display:block;background:#d2c7b4;border:1px solid #665c50;box-shadow:0 2px 0 rgba(0,0,0,.2);border-radius:2px}
+.parkThumb .rail{height:4px;background:#aeb5b7;border:0;border-radius:4px;box-shadow:0 1px 2px #333}
+.parkThumb .bowl{width:64px;height:42px;border-radius:50%;background:radial-gradient(ellipse,#777c7d 0 35%,#aaa 36% 45%,#967b57 47%);border:1px solid #5c5142}
+.parkThumb .quarter{width:62px;height:35px;background:linear-gradient(150deg,#e0c9a3 0 45%,#a17e50 46%);clip-path:polygon(0 100%,0 50%,18% 22%,50% 0,100% 0,100% 100%)}
+.parkThumb .stairs{width:60px;height:42px;background:repeating-linear-gradient(0deg,#d7cbb6 0 7px,#8f7a5d 7px 9px);clip-path:polygon(0 0,100% 50%,100% 100%,0 50%)}
+.parkThumb .box{width:55px;height:23px;background:#cdbb9b;border:1px solid #69573e;transform:skewY(-12deg)}
+.parkThumb .brick{width:70px;height:14px;background:repeating-linear-gradient(90deg,#a85e45 0 13px,#e1c6a4 13px 15px);border:1px solid #68412f}
+.parkName{font:700 15px 'DM Sans';color:#f4ead9}
+.parkMeta{font:500 11px/1.45 'DM Sans';color:#c8c0b2;min-height:45px}
+.parkPrice{font:700 13px 'DM Sans';color:#ead09a;margin-top:auto}
+.parkCard button{border:1px solid rgba(255,255,255,.18);border-radius:6px;background:#ba9b69;color:#2a241c;padding:9px 6px;font:700 11px 'DM Sans';letter-spacing:.4px;cursor:pointer}
+.parkCard button:disabled{background:#59634f;color:#e3eadc;cursor:default}
+.parkCard button.cant{background:#55483a;color:#cfc6b9}
+.parkFoot{padding:9px 16px;border-top:1px solid rgba(255,255,255,.12);font:500 10px/1.45 'DM Sans';color:#bcb3a4}
+#codeBtn{position:fixed;z-index:8;left:330px;bottom:18px;border:1px solid rgba(255,255,255,.32);border-radius:7px;padding:11px 16px;background:#52634b;color:#f6eddd;font:700 13px 'DM Sans';letter-spacing:.8px;box-shadow:0 3px 12px rgba(0,0,0,.28);cursor:pointer;pointer-events:auto}
+#codeBtn:hover{background:#657b5c}
+#codePanel{position:fixed;z-index:40;inset:0;display:none;align-items:center;justify-content:center;background:rgba(18,17,15,.66);backdrop-filter:blur(5px);pointer-events:auto;text-shadow:none}
+.codeBox{position:relative;width:min(420px,calc(100vw - 36px));box-sizing:border-box;padding:27px;background:#292722;color:#f4eee3;border:1px solid rgba(255,255,255,.22);border-radius:12px;box-shadow:0 18px 60px rgba(0,0,0,.48);text-align:center}
+.codeBox h2{margin:0 0 7px;font:700 23px 'DM Sans';letter-spacing:.7px}
+.codeBox p{margin:0 0 18px;color:#c9c1b4;font:500 12px/1.5 'DM Sans'}
+#codeInput{width:100%;box-sizing:border-box;padding:13px 14px;border:1px solid #8c806e;border-radius:6px;background:#eee7da;color:#29241d;font:700 16px 'DM Sans';letter-spacing:1.5px;text-align:center;text-transform:lowercase;outline:none}
+#codeInput:focus{border-color:#c8ad7b;box-shadow:0 0 0 2px rgba(200,173,123,.2)}
+.codeActions{display:flex;gap:9px;margin-top:12px}
+.codeActions button{flex:1;padding:11px 12px;border:1px solid rgba(255,255,255,.17);border-radius:6px;background:#c8ad7b;color:#30281e;font:700 12px 'DM Sans';cursor:pointer}
+.codeActions #codeClose{background:#51483b;color:#f1e9dd}
+#codeMessage{min-height:20px;margin-top:13px;color:#d6edaa;font:700 12px 'DM Sans'}
+@media(max-width:700px){#codeBtn{left:8px;bottom:94px;padding:9px 11px;font-size:11px}}
+@media(max-width:700px){#parkShopBtn{left:8px;bottom:52px;padding:9px 11px;font-size:11px}#parkShopPanel{inset:2vh 2vw}#parkShopHeader{padding:11px}#parkShopHeader h2{font-size:18px}#parkShopStats{width:100%;margin:0;text-align:left}#parkShopGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:9px}.parkCard{min-height:235px;padding:8px}.parkMeta{font-size:9px}}
+@media(max-width:700px){#shopBtn{left:8px;bottom:10px;padding:9px 11px;font-size:11px}#shopPanel{inset:2vh 2vw}#shopHeader{padding:11px}#shopHeader h2{font-size:18px}#shopStats{width:100%;margin:0;text-align:left}#shopGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:9px}.boardCard{min-height:165px;padding:8px}.boardMeta{font-size:9px}}
+
+@media(max-width:700px){#tl{right:7px;top:7px;width:190px;max-height:54vh;padding:8px}#tl li{font-size:11px;line-height:1.5}#cb{left:130px;right:205px;font-size:13px}#mult{left:130px;right:205px;top:48px;font-size:9px}#mult span{font-size:16px}#mult small{font-size:8px}#sc{left:8px;top:8px;font-size:25px}#cash{left:8px;top:65px;min-width:92px;padding:7px 10px;font-size:22px}#cash small{font-size:9px}#spd{left:8px;top:119px}#gs{left:8px;top:170px}#railStatus{left:8px;top:226px}#tm{bottom:16px}}
+
+#parkGatePanel{position:fixed;z-index:60;inset:0;display:none;align-items:center;justify-content:center;background:rgba(17,17,16,.72);backdrop-filter:blur(6px);pointer-events:auto;text-shadow:none}
+.parkGateBox{width:min(470px,calc(100vw - 34px));box-sizing:border-box;padding:28px;background:linear-gradient(155deg,#37332d,#24231f);color:#f3eee4;border:1px solid rgba(255,255,255,.23);border-radius:12px;box-shadow:0 18px 65px rgba(0,0,0,.55);text-align:center}
+.parkGateEyebrow{font:700 10px 'DM Sans';letter-spacing:2px;color:#d2b986}
+.parkGateBox h2{margin:9px 0 8px;font:700 clamp(22px,4vw,30px) 'DM Sans';letter-spacing:.4px}
+.parkGateBox p{margin:0 auto 13px;max-width:40ch;color:#d0c8b9;font:500 13px/1.5 'DM Sans'}
+#gatePrice{margin:12px 0 17px;color:#e5c58b;font:700 25px 'DM Sans'}
+.parkGateActions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.parkGateActions button{min-height:44px;border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:10px;background:#c8ad7b;color:#2b251d;font:700 12px 'DM Sans';letter-spacing:.5px;cursor:pointer}
+.parkGateActions #gateDeny{background:#51483e;color:#f4eee5}
+#gateMessage{min-height:19px;margin-top:13px;color:#e5b2a5;font:700 12px 'DM Sans'}
+@media(max-width:520px){.parkGateActions{grid-template-columns:1fr}.parkGateBox{padding:22px}}
+
+
+/* Final usability pass */
+button{font-family:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid #e7d09f;outline-offset:2px}
+#pauseBtn{position:fixed;z-index:9;right:16px;bottom:18px;border:1px solid rgba(255,255,255,.35);border-radius:7px;padding:11px 15px;background:#393a36;color:#f6f1e8;font:700 12px 'DM Sans',system-ui,sans-serif;letter-spacing:.7px;box-shadow:0 3px 12px rgba(0,0,0,.26);cursor:pointer;pointer-events:auto}
+#pauseBtn:hover{background:#50534b}
+#pausePanel,#graphicsError{position:fixed;z-index:100;inset:0;display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(19,19,18,.78);backdrop-filter:blur(7px);pointer-events:auto;text-shadow:none}
+.pauseBox,.graphicsErrorBox{width:min(460px,100%);box-sizing:border-box;padding:28px;background:linear-gradient(155deg,#38352f,#24231f);border:1px solid rgba(255,255,255,.22);border-radius:12px;box-shadow:0 18px 70px rgba(0,0,0,.55);color:#f2eee6}
+.pauseEyebrow,.graphicsErrorEyebrow{font:700 10px system-ui,sans-serif;letter-spacing:2px;color:#d4bc8c}
+.pauseBox h2,.graphicsErrorBox h2{margin:9px 0;font:700 27px system-ui,sans-serif;letter-spacing:.3px}
+.pauseIntro,.graphicsErrorBox p{margin:0 0 18px;color:#cec7bb;font:500 13px/1.55 system-ui,sans-serif}
+.pauseActions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.pauseActions button,.graphicsErrorBox button{min-height:42px;border:1px solid rgba(255,255,255,.17);border-radius:6px;background:#746448;color:#fff7e9;padding:10px 12px;font:700 11px system-ui,sans-serif;letter-spacing:.4px;cursor:pointer}
+.pauseActions .pausePrimary,.graphicsErrorBox button{background:#c5a976;color:#2b251d}
+.pauseActions .pauseSecondary{background:#4d4941}
+#saveMessage{min-height:20px;margin-top:13px;color:#d8e5bc;font:700 11px/1.45 system-ui,sans-serif}
+.pauseFine{margin:10px 0 0;color:#aaa294;font:500 10px/1.5 system-ui,sans-serif}
+.graphicsErrorBox{width:min(480px,100%)}
+.graphicsErrorBox button{min-width:150px}
+@media(max-width:700px){#pauseBtn{right:8px;bottom:10px;padding:9px 10px;font-size:10px}.pauseBox{padding:21px}.pauseActions{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.pauseActions{grid-template-columns:1fr}}
+
+</style><meta name="theme-color" content="#d8d5cf"><meta name="description" content="A handmade 3D fingerboard park with tricks, grinds, 21 boards, seven connected parks and a reward system."><meta name="color-scheme" content="dark"></head><body>
+<div id="sc" class="h"><small>SCORE</small><span id="sv">0</span></div>
+<div id="cash" class="h"><small>WALLET</small><span id="cashVal">$0</span></div>
+<button id="shopBtn" type="button">BOARD SHOP · 21 DECKS</button>
+<button id="parkShopBtn" type="button">PARK MAP</button>
+<button id="codeBtn" type="button">REDEEM CODE</button>
+<div id="codePanel" role="dialog" aria-modal="true" aria-label="Redeem a game code">
+ <div class="codeBox"><h2>REDEEM CODE</h2><p>Enter a park reward code to add cash to your wallet.</p><input id="codeInput" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="40" placeholder="Enter code"><div class="codeActions"><button id="redeemSubmit" type="button">REDEEM</button><button id="codeClose" type="button">CLOSE</button></div><div id="codeMessage" aria-live="polite"></div></div>
+</div>
+
+<button id="pauseBtn" type="button" aria-label="Pause and save">PAUSE / SAVE</button>
+<div id="pausePanel" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+ <div class="pauseBox">
+  <div class="pauseEyebrow">FINGERBOARD PARK</div>
+  <h2 id="pauseTitle">PAUSED</h2>
+  <p class="pauseIntro">Your progress is saved in this browser. Export a backup to move your save to another computer, such as a school computer.</p>
+  <div class="pauseActions">
+   <button id="resumeBtn" type="button" class="pausePrimary">RESUME SESSION</button>
+   <button id="exportSaveBtn" type="button">EXPORT SAVE FILE</button>
+   <button id="importSaveBtn" type="button">IMPORT SAVE FILE</button>
+   <button id="fullscreenBtn" type="button">TOGGLE FULLSCREEN</button>
+   <button id="pauseCloseBtn" type="button" class="pauseSecondary">CLOSE MENU</button>
+  </div>
+  <input id="saveFileInput" type="file" accept="application/json,.json" hidden>
+  <div id="saveMessage" role="status" aria-live="polite">Cash, boards, parks and redeemed codes are included in your backup.</div>
+  <p class="pauseFine">Save files are stored on this device only unless you export and import them. No account is required.</p>
+ </div>
+</div>
+<div id="graphicsError" role="alert" aria-live="assertive">
+ <div class="graphicsErrorBox">
+  <div class="graphicsErrorEyebrow">GRAPHICS COULD NOT START</div>
+  <h2>Fingerboard Park couldn't load</h2>
+  <p id="graphicsErrorDetail">This browser may not support WebGL, or the network may be blocking the 3D graphics library. Reload the page or try another browser/device.</p>
+  <button type="button" onclick="location.reload()">RELOAD GAME</button>
+ </div>
+</div>
+
+<div id="shopPanel" aria-label="Fingerboard shop">
+ <div id="shopHeader"><div><h2>FINGERBOARD SHOP</h2><p>21 original pro setups · graphic decks · different wheel colours and shapes</p></div><div id="shopStats">$0 WALLET · 1/21 OWNED</div><button id="shopClose" type="button" aria-label="Close shop">×</button></div>
+ <div id="shopGrid"></div>
+ <div class="shopFoot">Buy a setup to unlock and equip it. Better setups boost cash from both landed tricks and completed grinds. The Premium Finger Board costs $250,000 and gives a 2.50× board cash bonus. Total cost to unlock all 21 boards: $292,650.</div>
+</div>
+<div id="parkShopPanel" aria-label="Park shop">
+ <div id="parkShopHeader"><div><h2>CONNECTED PARK MAP</h2><p>One connected world · ride to each gate to unlock parks</p></div><div id="parkShopStats">$0 WALLET · 1/6 OWNED</div><button id="parkShopClose" type="button" aria-label="Close park shop">×</button></div>
+ <div id="parkShopGrid"></div>
+ <div class="parkFoot">All seven park modules are built side by side on one continuous deck, including the $500,000 full-gold Premium Park. Ride to an unopened park entrance to trigger its purchase prompt. CONFIRM buys permanent access; DENY returns you to the Workshop Starter. Use the PARK MAP to travel to an entrance. Your wallet, purchased parks and board collection are saved.</div>
+</div>
+
+<div id="parkGatePanel" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+ <div class="parkGateBox">
+  <div class="parkGateEyebrow">NEW PARK ACCESS</div>
+  <h2 id="gateTitle">UNLOCK PARK?</h2>
+  <p id="gateDescription">Purchase permanent access to this park. Once unlocked, you can ride here whenever you like.</p>
+  <div id="gatePrice">$1,000</div>
+  <div class="parkGateActions"><button id="gateConfirm" type="button">CONFIRM</button><button id="gateDeny" type="button">DENY · RETURN TO START</button></div>
+  <div id="gateMessage" aria-live="polite"></div>
+ </div>
+</div>
+<div id="mult" class="h">COMBO MULTIPLIER <span id="multVal">1.0×</span><small>+0.1× PER LINK · MAX 2.0× · RESETS AFTER A BREAK</small><small id="deckPayoutVal">DECK CASH BONUS · 1.00×</small></div>
+<div id="spd" class="h">SPEED <span id="spdVal">0.0</span></div>
+<div id="gs" class="h">GRIND STYLE <span id="grindName">50-50</span></div>
+<div id="railStatus" class="h">RAIL STATUS <span id="railState">FIND A RAIL</span></div>
+<div id="cb" class="h"></div><div id="ts" class="h"></div><div id="tm" class="h"><div id="tf"></div></div>
+<div id="tl" class="h"><strong>TRICK BOOK · 20 MOVES</strong><ol>
+<li data-k="kick"><kbd>←</kbd><span>Kickflip</span></li>
+<li data-k="heel"><kbd>→</kbd><span>Heelflip</span></li>
+<li data-k="pop"><kbd>↓</kbd><span>Pop shove-it</span></li>
+<li data-k="fs"><kbd>↑</kbd><span>FS shove-it</span></li>
+<li data-k="var"><kbd>←</kbd><kbd>↓</kbd><span>Varial flip</span></li>
+<li data-k="hard"><kbd>←</kbd><kbd>↑</kbd><span>Hardflip</span></li>
+<li data-k="inw"><kbd>→</kbd><kbd>↓</kbd><span>Inward heelflip</span></li>
+<li data-k="laser"><kbd>→</kbd><kbd>↑</kbd><span>Laser flip</span></li>
+<li data-k="tre"><kbd>←</kbd><kbd>→</kbd><span>360 flip</span></li>
+<li data-k="bigs"><kbd>Q</kbd><span>Bigspin</span></li>
+<li data-k="fsbs"><kbd>E</kbd><span>FS bigspin</span></li>
+<li data-k="bflip"><kbd>F</kbd><span>Bigflip</span></li>
+<li data-k="bheel"><kbd>G</kbd><span>Bigspin heelflip</span></li>
+<li data-k="imp"><kbd>T</kbd><span>Impossible</span></li>
+<li data-k="frontkick"><kbd>H</kbd><span>Frontside kickflip</span></li>
+<li data-k="backheel"><kbd>J</kbd><span>Backside heelflip</span></li>
+<li data-k="dolphin"><kbd>K</kbd><span>Dolphin flip</span></li>
+<li data-k="pressure"><kbd>L</kbd><span>Pressure flip</span></li>
+<li data-k="dragon"><kbd>V</kbd><span>Dragon flip</span></li>
+<li data-k="gazelle"><kbd>B</kbd><span>Gazelle flip</span></li>
+</ol>
+<div class="subhead">GRIND SELECT · 14 STYLES</div><ol>
+<li data-g="0"><kbd>1</kbd><span>50-50</span></li>
+<li data-g="1"><kbd>2</kbd><span>5-0</span></li>
+<li data-g="2"><kbd>3</kbd><span>Nosegrind</span></li>
+<li data-g="3"><kbd>4</kbd><span>Tailgrind</span></li>
+<li data-g="4"><kbd>5</kbd><span>Boardslide</span></li>
+<li data-g="5"><kbd>6</kbd><span>Lipslide</span></li>
+<li data-g="6"><kbd>7</kbd><span>Bluntslide</span></li>
+<li data-g="7"><kbd>8</kbd><span>Noseblunt</span></li>
+<li data-g="8"><kbd>9</kbd><span>Crooked grind</span></li>
+<li data-g="9"><kbd>0</kbd><span>Smith grind</span></li>
+<li data-g="10"><kbd>-</kbd><span>Feeble grind</span></li>
+<li data-g="11"><kbd>=</kbd><span>Overcrook</span></li>
+<li data-g="12"><kbd>[</kbd><span>Noseslide</span></li>
+<li data-g="13"><kbd>]</kbd><span>Tailslide</span></li>
+</ol><p>Choose a grind, build speed and ollie so the trucks meet the rail on the way down. 50-50s, 5-0s and nosegrinds need the deck along the rail; boardslides, lipslides and bluntslides need the deck across it. Tap <kbd>Space</kbd> to pop out.</p><p><kbd>W</kbd> push · <kbd>S</kbd> brake · <kbd>A</kbd>/<kbd>D</kbd> steer · <kbd>Space</kbd> ollie · <kbd>C</kbd> manual · <kbd>R</kbd> reset</p></div>
+<div id="ctl" class="h"><kbd>W</kbd> push <kbd>S</kbd> brake <kbd>A</kbd><kbd>D</kbd> steer <kbd>Space</kbd> ollie <kbd>C</kbd> manual<br><kbd>←</kbd> kickflip <kbd>→</kbd> heelflip <kbd>↓</kbd> pop shove-it <kbd>↑</kbd> FS shove-it<br>Two arrows at once: <kbd>←</kbd><kbd>↓</kbd> varial · <kbd>←</kbd><kbd>↑</kbd> hardflip · <kbd>→</kbd><kbd>↓</kbd> inward heel · <kbd>→</kbd><kbd>↑</kbd> laser · <kbd>←</kbd><kbd>→</kbd> 360 flip<br><b>Hold</b> a trick key in the air to spin the board. It spins only while you hold, so let go after one full spin and land flat.<br><kbd>R</kbd> reset · <kbd>1</kbd>–<kbd>0</kbd>, <kbd>-</kbd>, <kbd>=</kbd>, <kbd>[</kbd>, <kbd>]</kbd> choose grind style</div>
+<div id="st"><h1>Fingerboard Park</h1><p>Drop in, build some speed, then pop an ollie and throw a trick.</p><p>Ride a handmade fingerboard park with plywood ramps, concrete ledges, rails and bowls.</p><p>All seven parks are connected in one giant rideable world, including the full-gold Premium Park. Ride across a park entrance to stop at its gate, then CONFIRM to buy permanent access or DENY to return to the starter area. The PARK MAP can send you to any park entrance. Choose a grind with <kbd>1</kbd>–<kbd>0</kbd>, <kbd>-</kbd>, <kbd>=</kbd>, <kbd>[</kbd> or <kbd>]</kbd>.</p><p>Earn cash by landing tricks and grinding. Harder tricks and smoother landings pay more. Link tricks and grinds before the combo timer ends to raise your combo multiplier by 0.1× each time, up to 2.0×. Open the BOARD SHOP to buy 21 original deck and wheel setups, including the $250,000 full-gold Premium Finger Board; better boards boost all cash rewards. Buy larger parks as you build your wallet.</p><p class="start">CLICK TO START</p><p><kbd>W</kbd> push · <kbd>Space</kbd> ollie / pop out · <kbd>A</kbd>/<kbd>D</kbd> steer · <kbd>R</kbd> reset · scroll to zoom · PARK MAP to find connected parks · ESC to pause and save</p></div>
+
+<script>
+(function(){
+ function showGraphicsError(message){
+  const panel=document.getElementById('graphicsError');
+  const detail=document.getElementById('graphicsErrorDetail');
+  if(!panel)return;
+  if(detail && message) detail.textContent='The 3D game stopped while starting: '+message+'. The browser may not support WebGL, or the school network may block the 3D graphics library. Try reloading or using another browser/device.';
+  panel.style.display='flex';
+ }
+ window.addEventListener('error',function(event){
+  const message=event && (event.message || (event.target && event.target.src ? 'Could not load '+event.target.src : 'A game script failed'));
+  showGraphicsError(message);
+ },true);
+ window.addEventListener('unhandledrejection',function(event){showGraphicsError(String(event.reason||'A game task failed'))});
+ window.addEventListener('fingerboard-three-missing',function(){showGraphicsError('The Three.js graphics library did not load')});
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" onerror="window.dispatchEvent(new Event('fingerboard-three-missing'))"></script>
+<script>
+const T=THREE,G=6.5,CY=.74;
+const R=new T.WebGLRenderer({antialias:true,powerPreference:"high-performance"});R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.6));
+R.shadowMap.enabled=true;R.shadowMap.type=T.PCFSoftShadowMap;R.outputEncoding=T.sRGBEncoding;R.toneMapping=T.ACESFilmicToneMapping;R.toneMappingExposure=1.06;
+document.body.prepend(R.domElement);R.domElement.tabIndex=0;
+const S=new T.Scene();
+S.background=new T.Color(0xd8d5cf);
+S.fog=new T.Fog(0xd8d5cf,52,115);
+const cam=new T.PerspectiveCamera(44,1,.05,110);
+function rs(){R.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}
+addEventListener('resize',rs);rs();
+S.add(new T.HemisphereLight(0xf3f1eb,0x80715e,.92));
+const sun=new T.DirectionalLight(0xfff4e5,2.05);sun.position.set(-8,18,10);sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-21,right:21,top:17,bottom:-17,near:1,far:55});sun.shadow.bias=-.00022;sun.shadow.normalBias=.014;S.add(sun,sun.target);
+const fillLight=new T.DirectionalLight(0xe5e8e8,.48);fillLight.position.set(12,8,-10);S.add(fillLight);
+const bounceLight=new T.DirectionalLight(0xd2b995,.16);bounceLight.position.set(-10,5,-12);S.add(bounceLight);
+function tex(w,h,f,rx,ry){const k=document.createElement('canvas');k.width=w;k.height=h;f(k.getContext('2d'),w,h);const t=new T.CanvasTexture(k);t.encoding=T.sRGBEncoding;t.anisotropy=8;if(rx){t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(rx,ry)}return t}
+const wood=tex(1024,512,(c,w,h)=>{
+ c.fillStyle='#ad8454';c.fillRect(0,0,w,h);
+ for(let i=0;i<1250;i++){const y=Math.random()*h,a=.018+Math.random()*.055;c.strokeStyle=Math.random()<.55?`rgba(54,35,18,${a})`:`rgba(247,224,187,${a})`;c.lineWidth=.4+Math.random()*.8;c.beginPath();c.moveTo(0,y);c.bezierCurveTo(w*.24,y-2,w*.68,y+2,w,y+Math.random()*2-1);c.stroke()}
+ for(let i=0;i<45;i++){const x=Math.random()*w,y=Math.random()*h;c.strokeStyle='rgba(65,42,22,.10)';c.lineWidth=.8;c.beginPath();c.ellipse(x,y,8+Math.random()*17,2+Math.random()*5,Math.random()*.3,0,Math.PI*2);c.stroke();c.beginPath();c.ellipse(x,y,3+Math.random()*8,1+Math.random()*2,Math.random()*.3,0,Math.PI*2);c.stroke()}
+ for(let y=0;y<h;y+=h/7){c.fillStyle='rgba(65,43,24,.11)';c.fillRect(0,y,w,1);c.fillStyle='rgba(255,237,205,.12)';c.fillRect(0,y+2,w,1)}
+},2,1);
+const parkSurface=tex(1024,1024,(c,w,h)=>{
+ c.fillStyle='#a98555';c.fillRect(0,0,w,h);
+ const plankH=h/8;
+ for(let row=0;row<8;row++){
+  const y=row*plankH;c.fillStyle=row%2?'rgba(76,52,29,.035)':'rgba(255,235,200,.035)';c.fillRect(0,y,w,plankH);
+  c.fillStyle='rgba(67,47,28,.19)';c.fillRect(0,y,w,1.2);c.fillStyle='rgba(255,238,206,.18)';c.fillRect(0,y+2,w,1);
+  const joint=(row%2? .32:.68)*w;c.fillStyle='rgba(66,47,29,.16)';c.fillRect(joint,y,1.2,plankH);c.fillStyle='rgba(255,238,208,.16)';c.fillRect(joint+2,y,1,plankH);
+ }
+ for(let i=0;i<2600;i++){const x=Math.random()*w,y=Math.random()*h,a=.012+Math.random()*.045;c.strokeStyle=Math.random()<.55?`rgba(64,43,23,${a})`:`rgba(255,235,201,${a})`;c.lineWidth=.35+Math.random()*.65;c.beginPath();c.moveTo(x,y);c.lineTo(x+8+Math.random()*65,y+(Math.random()-.5)*1.8);c.stroke()}
+ for(let i=0;i<26;i++){const x=Math.random()*w,y=Math.random()*h;c.strokeStyle='rgba(71,48,26,.10)';c.lineWidth=1;c.beginPath();c.ellipse(x,y,5+Math.random()*11,2+Math.random()*4,Math.random()*.25,0,Math.PI*2);c.stroke()}
+},2,2);
+const ply=tex(512,512,(c,w,h)=>{
+ c.fillStyle='#c4a174';c.fillRect(0,0,w,h);
+ for(let i=0;i<780;i++){const y=Math.random()*h,a=.025+Math.random()*.065;c.strokeStyle=Math.random()<.5?`rgba(75,49,24,${a})`:`rgba(255,239,210,${a})`;c.lineWidth=.4+Math.random()*1;c.beginPath();c.moveTo(0,y);c.lineTo(w,y+(Math.random()-.5)*2);c.stroke()}
+ for(let y=0;y<h;y+=h/10){c.fillStyle='rgba(89,59,31,.055)';c.fillRect(0,y,w,1)}
+},2,2);
+const concrete=tex(512,512,(c,w,h)=>{
+ c.fillStyle='#999b99';c.fillRect(0,0,w,h);
+ for(let i=0;i<6200;i++){const v=Math.random()<.5?72:232,a=.018+Math.random()*.065;c.fillStyle=`rgba(${v},${v},${v},${a})`;const x=Math.random()*w,y=Math.random()*h;c.fillRect(x,y,.5+Math.random()*2.4,.5+Math.random()*2.2)}
+ for(let i=0;i<38;i++){const x=Math.random()*w,y=Math.random()*h;c.strokeStyle='rgba(70,74,72,.06)';c.lineWidth=.7;c.beginPath();c.moveTo(x,y);c.lineTo(x+12+Math.random()*35,y+Math.random()*3-1.5);c.stroke()}
+},1,1);
+const grip=tex(128,128,(c,w,h)=>{c.fillStyle='#202428';c.fillRect(0,0,w,h);for(let i=0;i<1800;i++){c.fillStyle=`rgba(255,255,255,${Math.random()*.09})`;c.fillRect(Math.random()*w,Math.random()*h,1,1)}});
+const goldPly=tex(512,512,(c,w,h)=>{const g=c.createLinearGradient(0,0,w,h);g.addColorStop(0,'#f6df83');g.addColorStop(.28,'#c99a24');g.addColorStop(.52,'#ffe9a0');g.addColorStop(.76,'#b98516');g.addColorStop(1,'#f3d66a');c.fillStyle=g;c.fillRect(0,0,w,h);for(let i=0;i<1100;i++){const y=Math.random()*h,a=.025+Math.random()*.075;c.strokeStyle=Math.random()<.5?`rgba(91,58,5,${a})`:`rgba(255,250,209,${a})`;c.lineWidth=.4+Math.random()*.8;c.beginPath();c.moveTo(0,y);c.lineTo(w,y+(Math.random()-.5)*3);c.stroke()}} ,2,2);
+const goldSurface=tex(1024,1024,(c,w,h)=>{const g=c.createLinearGradient(0,0,w,h);g.addColorStop(0,'#e7c34c');g.addColorStop(.5,'#b88716');g.addColorStop(1,'#f4dc83');c.fillStyle=g;c.fillRect(0,0,w,h);for(let y=0;y<h;y+=h/9){c.fillStyle='rgba(74,49,5,.18)';c.fillRect(0,y,w,2);c.fillStyle='rgba(255,244,181,.24)';c.fillRect(0,y+3,w,1)}for(let i=0;i<4200;i++){const x=Math.random()*w,y=Math.random()*h,a=.02+Math.random()*.06;c.strokeStyle=Math.random()<.5?`rgba(80,55,8,${a})`:`rgba(255,248,202,${a})`;c.lineWidth=.4+Math.random()*.8;c.beginPath();c.moveTo(x,y);c.lineTo(x+5+Math.random()*28,y+(Math.random()-.5)*1.4);c.stroke()}} ,2,2);
+const goldGrip=tex(512,512,(c,w,h)=>{const g=c.createLinearGradient(0,0,w,h);g.addColorStop(0,'#d7ad32');g.addColorStop(.5,'#8d6613');g.addColorStop(1,'#e8c957');c.fillStyle=g;c.fillRect(0,0,w,h);for(let i=0;i<42000;i++){const a=.04+Math.random()*.12;c.fillStyle=Math.random()<.5?`rgba(255,240,166,${a})`:`rgba(48,33,5,${a})`;c.fillRect(Math.random()*w,Math.random()*h,1,1)}} ,4,1);
+const art=tex(256,128,(c,w,h)=>{c.fillStyle='#b7a078';c.fillRect(0,0,w,h);c.fillStyle='rgba(52,44,32,.8)';c.font='700 26px sans-serif';c.textAlign='center';c.fillText('FB',w/2,h/2+9)});
+const gd=new Uint8Array([110,170,225,255]),gm=new T.DataTexture(gd,4,1,T.LuminanceFormat);gm.minFilter=gm.magFilter=T.NearestFilter;gm.generateMipmaps=false;gm.needsUpdate=true;
+const PL=[0xc1a071,0xb58e5c,0xc9aa7b,0xa98355];let parkColorIndex=0;
+const LM=new T.LineBasicMaterial({color:0x493b2c,transparent:true,opacity:.62}),OM=new T.MeshBasicMaterial({color:0x493b2c,side:T.BackSide});
+const M=(c,m,o)=>new T.MeshStandardMaterial(Object.assign({color:c,map:m||null,roughness:.88,metalness:0,side:T.DoubleSide},o||{}));
+function add(m,x,y,z){m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;const edges=new T.LineSegments(new T.EdgesGeometry(m.geometry,38),LM);m.add(edges);S.add(m);return m}
+// Park progression: one free starter spot plus five paid parks.
+// Park features are original combinations inspired by modular fingerboard obstacles and park lines.
+const PARK_CATALOG=[
+ {id:0,name:'Workshop Starter',price:0,theme:'Handmade wood and concrete',desc:'Your original park: quarter pipe, funbox, stair rail, manual pad and a smooth bowl.',features:'Bowl · funbox · stairs · manual pad',thumb:'starter',bowl:{x:7.0,z:5.55,rx:4.15,rz:3.15,depth:.48,flat:.24}},
+ {id:1,name:'Street Plaza',price:1000,theme:'Classic street spot',desc:'A clean street plaza with a long stair set, twin handrails, hubba ledges, bank and brick curb.',features:'8-step set · twin rails · hubbas · brick curb',thumb:'street'},
+ {id:2,name:'Mini Ramp Hangar',price:9000,theme:'Flow and transition',desc:'A wide mini-ramp setup with opposing quarterpipes, extensions, a spine transfer and a central flatbar.',features:'Mini ramp · spine · extensions · transfer rail',thumb:'mini'},
+ {id:3,name:'Brick District',price:18000,theme:'Technical street lines',desc:'Brick manual pads, grass gaps, loading dock ledges, a bigger stair set and several rail approaches.',features:'Brick ledges · grass gap · stair set · loading dock',thumb:'brick'},
+ {id:4,name:'Concrete Bowl Flow',price:35000,theme:'Pool and transition park',desc:'A large concrete bowl with a deeper pocket, pool coping, quarterpipe extensions and a bank-to-ledge line.',features:'Deep bowl · pool coping · extensions · bank line',thumb:'bowl',bowl:{x:6.7,z:5.45,rx:4.7,rz:3.75,depth:.72,flat:.21}},
+ {id:5,name:'Blacktop Pro Arena',price:65000,theme:'Competition-style mega spot',desc:'A premium multi-line course with a big bowl, two stair sets, hubba ledges, banks, a spine and multiple rails.',features:'Big bowl · dual stair sets · hubbas · spine · rails',thumb:'pro',bowl:{x:8.0,z:5.3,rx:4.35,rz:3.55,depth:.65,flat:.22}},
+ {id:6,name:'Premium Park',price:500000,theme:'Full-gold luxury skatepark',desc:'A complete gold-plated showpiece with a deep gold bowl, precision stair set, gold handrails, premium banks and polished grind ledges.',features:'Gold bowl · gold stair set · gold rails · gold funbox · gold ledges',thumb:'premium',bowl:{x:7.0,z:5.5,rx:4.55,rz:3.35,depth:.72,flat:.22}}
+];
+let ownedParkIds=[0],activeParkId=0;
+const PARK_SPACING=34;
+const parkStartX=id=>id*PARK_SPACING-17;
+const parkAtX=x=>Math.max(0,Math.min(PARK_CATALOG.length-1,Math.floor((x+17)/PARK_SPACING)));
+try{const savedParks=JSON.parse(localStorage.getItem('fingerboardParkOwnedParks')||'[0]');if(Array.isArray(savedParks))ownedParkIds=[...new Set([0,...savedParks.map(Number).filter(n=>Number.isInteger(n)&&n>=0&&n<PARK_CATALOG.length)])]}catch(e){}
+function saveParkData(){try{localStorage.setItem('fingerboardParkOwnedParks',JSON.stringify(ownedParkIds));localStorage.setItem('fingerboardParkSelectedPark',String(activeParkId))}catch(e){}}
+let bowlSpec=null,premiumBuild=false;
+let P=[],RL=[];
+const premiumObstacleMat=()=>M(0xd5aa31,goldPly,{metalness:.48,roughness:.38});
+function box(x,z,w,d,h,c){P.push({t:'b',x,z,w,d,h});const mat=premiumBuild?premiumObstacleMat():M(PL[parkColorIndex++%4],ply);add(new T.Mesh(new T.BoxGeometry(w,h,d),mat),x,h/2,z)}
+function wedge(x,z,w,d,a,b,c){P.push({t:'w',x,z,w,d,a,b});const sh=new T.Shape();sh.moveTo(0,0);sh.lineTo(w,0);sh.lineTo(w,b);sh.lineTo(0,a);const mat=premiumBuild?premiumObstacleMat():M(PL[parkColorIndex++%4],ply);const mesh=new T.Mesh(new T.ExtrudeGeometry(sh,{depth:d,bevelEnabled:false}),mat);mesh.castShadow=mesh.receiveShadow=true;mesh.add(new T.LineSegments(new T.EdgesGeometry(mesh.geometry,38),LM));S.add(mesh);mesh.position.set(x-w/2,0,z-d/2);return mesh}
+function quarter(x0,z,d,r,dir){const S1=r*.866,n=56,sh=new T.Shape();P.push({t:'q',x:x0,z,d,R:r,dir});sh.moveTo(0,0);sh.lineTo(dir*S1,0);for(let i=n;i>=0;i--){const u=S1*i/n;sh.lineTo(dir*u,r-Math.sqrt(r*r-u*u))}const mat=premiumBuild?premiumObstacleMat():M(0xb18a59,ply,{roughness:.92});const mesh=new T.Mesh(new T.ExtrudeGeometry(sh,{depth:d,bevelEnabled:false}),mat);mesh.castShadow=mesh.receiveShadow=true;mesh.add(new T.LineSegments(new T.EdgesGeometry(mesh.geometry,38),LM));S.add(mesh);mesh.position.set(x0,0,z-d/2);box(x0+dir*(S1+.8),z,1.6,d,r*.5,0xffffff);const copingMat=new T.MeshStandardMaterial({color:premiumBuild?0xf5d66d:0x7b8387,metalness:premiumBuild?.88:.55,roughness:premiumBuild?.22:.42});const coping=new T.Mesh(new T.CylinderGeometry(.028,.028,d,12),copingMat);coping.position.set(x0+dir*S1,r*.5,z);coping.rotation.x=Math.PI/2;coping.castShadow=true;S.add(coping)}
+function H(x,z){
+ const worldMaxX=PARK_SPACING*(PARK_CATALOG.length-1)+17;
+ if(x< -17.05||x>worldMaxX+.05||Math.abs(z)>9.75)return -9;
+ let h=0;
+ for(const p of P){
+  if(Math.abs(z-p.z)>p.d/2)continue;
+  if(p.t==='bowl'){
+   const nx=(x-p.x)/p.rx,nz=(z-p.z)/p.rz,rad=Math.hypot(nx,nz);
+   if(rad<=1){if(rad<=p.flat)h=-p.depth;else{const q=(rad-p.flat)/(1-p.flat),smooth=q*q*q*(q*(q*6-15)+10);h=-p.depth*(1-smooth)}}
+  }else if(p.t==='b'){
+   if(Math.abs(x-p.x)<=p.w/2)h=Math.max(h,p.h);
+  }else if(p.t==='w'){
+   const u=(x-p.x)/p.w+.5;if(u>=0&&u<=1)h=Math.max(h,p.a+(p.b-p.a)*u);
+  }else if(p.t==='q'){
+   const along=(x-p.x)*p.dir;if(along>=0&&along<=p.R*.866)h=Math.max(h,p.R-Math.sqrt(p.R*p.R-along*along));
+  }
+ }
+ return h;
+}
+function rail(name,x0,z0,x1,z1,h0,h1,kind='round'){
+ const dx=x1-x0,dz=z1-z0,len=Math.hypot(dx,dz);if(len<.2)return;const r={name,x0,z0,x1,z1,dx,dz,len,ux:dx/len,uz:dz/len,h0,h1,kind,radius:kind==='flat'?.0325:.045};RL.push(r);
+ const steel=new T.MeshStandardMaterial({color:premiumBuild?0xf0ca54:(kind==='flat'?0x858b8e:0xaeb5b6),metalness:premiumBuild?.9:.68,roughness:premiumBuild?.2:.34}),supportMat=new T.MeshStandardMaterial({color:premiumBuild?0x9b741b:0x74716a,metalness:premiumBuild?.78:.48,roughness:premiumBuild?.26:.48});
+ const a=new T.Vector3(x0,h0,z0),b=new T.Vector3(x1,h1,z1),direction=b.clone().sub(a);
+ if(kind==='flat'&&Math.abs(h1-h0)<.001){const bar=new T.Mesh(new T.BoxGeometry(len,.065,.105),steel);bar.position.copy(a).add(b).multiplyScalar(.5);bar.rotation.y=-Math.atan2(dz,dx);bar.castShadow=bar.receiveShadow=true;bar.add(new T.LineSegments(new T.EdgesGeometry(bar.geometry,30),LM));S.add(bar)}else{const bar=new T.Mesh(new T.CylinderGeometry(.045,.045,direction.length(),16),steel);bar.position.copy(a).add(b).multiplyScalar(.5);bar.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),direction.clone().normalize());bar.castShadow=bar.receiveShadow=true;S.add(bar)}
+ const count=Math.max(2,Math.floor(len/1.25));for(let i=0;i<=count;i++){const t=.08+.84*i/count,x=x0+dx*t,z=z0+dz*t,h=h0+(h1-h0)*t,base=Math.max(0,H(x,z)),height=Math.max(.055,h-base);const post=new T.Mesh(new T.CylinderGeometry(.023,.03,height,10),supportMat);post.position.set(x,base+height/2,z);post.castShadow=true;S.add(post);const foot=new T.Mesh(new T.BoxGeometry(.17,.025,.13),supportMat);foot.position.set(x,base+.012,z);foot.rotation.y=-Math.atan2(dz,dx);foot.castShadow=true;S.add(foot)}
+ for(const q of [a,b]){const cap=new T.Mesh(new T.SphereGeometry(.046,12,8),steel);cap.position.copy(q);S.add(cap)}
+}
+const concreteCap=(x,z,w,d,h)=>{const m=new T.Mesh(new T.BoxGeometry(w,.055,d),premiumBuild?M(0xd7ad35,goldPly,{roughness:.34,metalness:.48}):M(0xffffff,concrete,{roughness:.96}));m.position.set(x,h+.0275,z);m.castShadow=true;m.receiveShadow=true;m.add(new T.LineSegments(new T.EdgesGeometry(m.geometry,35),LM));S.add(m)};
+const cappedLedge=(x,z,w,d,h)=>{box(x,z,w,d,h,0xffffff);concreteCap(x,z,w-.04,d-.04,h)};
+function stairSet(x,z,width,count,stepD,maxH,railOffset=1){const heights=[];for(let i=0;i<count;i++){const h=maxH*(1-i/count);heights.push(h);box(x,z+i*stepD,width,stepD+.025,h,0xffffff)}const railX=x+railOffset*(width/2+.22),z0=z-.18,z1=z+(count-1)*stepD+.38;rail('Stair handrail',railX,z0,railX,z1,maxH+.34,.30,'round');return {x,z,width,count,stepD,heights}}
+function brickDetail(x,z,w,h){const brickMat=new T.MeshStandardMaterial({color:0x9f5e46,roughness:.92}),mortar=new T.MeshStandardMaterial({color:0xd0b99d,roughness:1});for(let i=0;i<Math.floor(w/.34);i++){const b=new T.Mesh(new T.BoxGeometry(.31,.075,.035),brickMat);b.position.set(x-w/2+.17+i*.34,h*.48,z+.22);b.castShadow=true;S.add(b);if(i%2===0){const seam=new T.Mesh(new T.BoxGeometry(.018,.07,.04),mortar);seam.position.set(b.position.x+.15,b.position.y,z+.24);S.add(seam)}}}
+function addPlywoodBase(){const deckTop=M(0xffffff,premiumBuild?goldSurface:parkSurface,{roughness:premiumBuild?.48:.96,metalness:premiumBuild?.38:0,transparent:true,opacity:0,depthWrite:false}),deckSurfaceMat=M(premiumBuild?0xf0d56b:0xffffff,premiumBuild?goldSurface:parkSurface,{roughness:premiumBuild?.46:.96,metalness:premiumBuild?.34:0}),deckSide=M(premiumBuild?0xd4a92e:0xb88d56,premiumBuild?goldPly:wood,{roughness:premiumBuild?.32:.94,metalness:premiumBuild?.58:0}),deckBottom=M(premiumBuild?0x9b741c:0x8d704b,premiumBuild?goldPly:wood,{roughness:premiumBuild?.4:1,metalness:premiumBuild?.45:0});const desk=new T.Mesh(new T.BoxGeometry(34,.54,20),[deckSide,deckSide,deckTop,deckBottom,deckSide,deckSide]);desk.position.set(0,-.27,0);desk.receiveShadow=true;desk.castShadow=false;desk.add(new T.LineSegments(new T.EdgesGeometry(desk.geometry,35),LM));S.add(desk);
+ const shape=new T.Shape();shape.moveTo(-17,-10);shape.lineTo(17,-10);shape.lineTo(17,10);shape.lineTo(-17,10);shape.closePath();if(bowlSpec){const hole=new T.Path();hole.absellipse(bowlSpec.x,-bowlSpec.z,bowlSpec.rx,bowlSpec.rz,0,Math.PI*2,true);shape.holes.push(hole)}const surface=new T.Mesh(new T.ShapeGeometry(shape,64),deckSurfaceMat);surface.rotation.x=-Math.PI/2;surface.position.y=.004;surface.receiveShadow=true;surface.add(new T.LineSegments(new T.EdgesGeometry(surface.geometry,50),new T.LineBasicMaterial({color:0x6d583d,transparent:true,opacity:.22})));S.add(surface);
+ const seamMat=new T.MeshBasicMaterial({color:0x684b2e});for(const y of [-.135,-.27,-.405]){const seam=new T.Mesh(new T.BoxGeometry(33.98,.009,.018),seamMat);seam.position.set(0,y,10.006);S.add(seam);const ss=new T.Mesh(new T.BoxGeometry(.018,.009,19.98),seamMat);ss.position.set(17.006,y,0);S.add(ss)}const joint=new T.LineBasicMaterial({color:0x6e5437,transparent:true,opacity:.13});for(let x=-14;x<=14;x+=4){const g=new T.BufferGeometry().setFromPoints([new T.Vector3(x,.009,-9.8),new T.Vector3(x,.009,9.8)]);S.add(new T.Line(g,joint))}}
+function buildBowl(){if(!bowlSpec)return;P.push({t:'bowl',x:bowlSpec.x,z:bowlSpec.z,rx:bowlSpec.rx,rz:bowlSpec.rz,d:bowlSpec.rz*2,depth:bowlSpec.depth,flat:bowlSpec.flat});const surfaceY=rad=>{if(rad<=bowlSpec.flat)return -bowlSpec.depth;const q=(rad-bowlSpec.flat)/(1-bowlSpec.flat),sm=q*q*q*(q*(q*6-15)+10);return -bowlSpec.depth*(1-sm)};const rings=72,segments=224,positions=[bowlSpec.x,-bowlSpec.depth,bowlSpec.z],uvs=[.5,.5],indices=[];for(let j=1;j<=rings;j++){const rad=j/rings,y=surfaceY(rad);for(let i=0;i<segments;i++){const a=i/segments*Math.PI*2;positions.push(bowlSpec.x+Math.cos(a)*bowlSpec.rx*rad,y,bowlSpec.z+Math.sin(a)*bowlSpec.rz*rad);uvs.push(.5+.5*Math.cos(a)*rad,.5+.5*Math.sin(a)*rad)}}for(let i=0;i<segments;i++){const n=(i+1)%segments;indices.push(0,1+n,1+i)}for(let j=1;j<rings;j++){const inner=1+(j-1)*segments,outer=1+j*segments;for(let i=0;i<segments;i++){const n=(i+1)%segments;indices.push(inner+i,inner+n,outer+i,inner+n,outer+n,outer+i)}}const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(positions,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));geo.setIndex(indices);geo.computeVertexNormals();const mat=premiumBuild?M(0xd6ad36,goldSurface,{roughness:.38,metalness:.52,side:T.DoubleSide}):M(0xffffff,concrete,{roughness:.94,side:T.DoubleSide}),mesh=new T.Mesh(geo,mat);mesh.castShadow=true;mesh.receiveShadow=true;S.add(mesh);const points=[];for(let i=0;i<224;i++){const a=i/224*Math.PI*2;points.push(new T.Vector3(bowlSpec.x+Math.cos(a)*bowlSpec.rx,.012,bowlSpec.z+Math.sin(a)*bowlSpec.rz))}const curve=new T.CatmullRomCurve3(points,true,'centripetal'),coping=new T.Mesh(new T.TubeGeometry(curve,448,.028,10,true),new T.MeshStandardMaterial({color:premiumBuild?0xffe37a:0x92999b,metalness:premiumBuild?.92:.62,roughness:premiumBuild?.18:.38}));coping.castShadow=true;S.add(coping)}
+function buildStarterFallback(){
+ quarter(-14.1,-5.5,5.2,1.45,1);box(-11.1,-5.5,3.0,5.2,.725,0xffffff);
+ wedge(-10.2,.15,2.6,4.3,0,.68,0xffffff);box(-8.0,.15,1.8,4.3,.68,0xffffff);wedge(-6.4,.15,1.6,4.3,.68,0,0xffffff);
+ const green=new T.MeshStandardMaterial({color:0x667f50,roughness:1});for(const [x,z,w,d] of [[-10.55,-2.45,1.9,.58],[-5.45,.15,.16,4.15]]){const strip=new T.Mesh(new T.BoxGeometry(w,.012,d),green);strip.position.set(x,.008,z);strip.receiveShadow=true;S.add(strip)}
+ rail('Bank incline rail',-11.1,-1.82,-8.95,-1.82,.47,1.04,'round');
+ cappedLedge(4.7,-2.65,4.35,2.65,.715);stairSet(4.7,-1.05,3.55,5,.55,.54,-1);rail('Funbox flat bar',-3.48,4.12,-2.02,4.12,.60,.60,'round');
+ wedge(-4.55,3.25,1.8,2.8,0,.44,0xffffff);box(-2.75,3.25,1.8,2.8,.44,0xffffff);wedge(-.85,3.25,2.0,2.8,.44,0,0xffffff);concreteCap(-2.75,3.25,1.78,2.76,.44);
+ cappedLedge(-1.35,-3.65,3.25,.82,.235);rail('Low ledge flat bar',-2.75,-3.98,.05,-3.98,.39,.39,'flat');
+ wedge(1.25,-6.25,1.65,2.25,0,.42,0xffffff);box(2.42,-6.25,.72,2.25,.42,0xffffff);wedge(3.12,-6.25,1.42,2.25,.42,0,0xffffff);rail('Kicker coping',2.08,-7.2,2.08,-5.3,.45,.45,'round');
+}
+function buildParkFeatures(){
+if(activeParkId===0){
+ // Starter park: preserve the original handmade plywood layout.
+ quarter(-14.1,-5.5,5.2,1.45,1);box(-11.1,-5.5,3.0,5.2,.725,0xffffff);
+ wedge(-10.2,.15,2.6,4.3,0,.68,0xffffff);box(-8.0,.15,1.8,4.3,.68,0xffffff);wedge(-6.4,.15,1.6,4.3,.68,0,0xffffff);
+ const green=new T.MeshStandardMaterial({color:0x667f50,roughness:1});for(const [x,z,w,d] of [[-10.55,-2.45,1.9,.58],[-5.45,.15,.16,4.15]]){const strip=new T.Mesh(new T.BoxGeometry(w,.012,d),green);strip.position.set(x,.008,z);strip.receiveShadow=true;S.add(strip)}
+ rail('Bank incline rail',-11.1,-1.82,-8.95,-1.82,.47,1.04,'round');
+ cappedLedge(4.7,-2.65,4.35,2.65,.715);stairSet(4.7,-1.05,3.55,5,.55,.54,-1);rail('Funbox flat bar',-3.48,4.12,-2.02,4.12,.60,.60,'round');
+ wedge(-4.55,3.25,1.8,2.8,0,.44,0xffffff);box(-2.75,3.25,1.8,2.8,.44,0xffffff);wedge(-.85,3.25,2.0,2.8,.44,0,0xffffff);concreteCap(-2.75,3.25,1.78,2.76,.44);
+ cappedLedge(-1.35,-3.65,3.25,.82,.235);rail('Low ledge flat bar',-2.75,-3.98,.05,-3.98,.39,.39,'flat');
+ wedge(1.25,-6.25,1.65,2.25,0,.42,0xffffff);box(2.42,-6.25,.72,2.25,.42,0xffffff);wedge(3.12,-6.25,1.42,2.25,.42,0,0xffffff);rail('Kicker coping',2.08,-7.2,2.08,-5.3,.45,.45,'round');
+}else if(activeParkId===1){
+ // Street Plaza: long stair set, paired rails, hubbas and a brick manual pad.
+ wedge(-10.4,-.1,2.7,5.2,0,.72,0xffffff);box(-8.35,-.1,1.5,5.2,.72,0xffffff);wedge(-6.75,-.1,1.7,5.2,.72,0,0xffffff);
+ stairSet(.6,-2.9,3.0,8,.48,.92,-1);rail('Street stair double rail',2.45,-3.0,2.45,1.15,1.24,.34,'round');rail('Street stair second rail',-1.1,-3.0,-1.1,1.15,1.24,.34,'round');
+ cappedLedge(-4.45,3.2,4.2,.74,.42);rail('Long hubba coping',-6.3,3.54,-2.6,3.54,.58,.58,'flat');
+ cappedLedge(6.7,-1.8,3.1,.78,.52);brickDetail(6.7,-2.18,2.9,.52);rail('Brick curb rail',5.2,-2.2,8.15,-2.2,.69,.69,'round');
+ wedge(4.6,4.5,2.4,2.0,0,.48,0xffffff);box(6.2,4.5,1.0,2,.48,0xffffff);wedge(7.4,4.5,1.4,2,.48,0,0xffffff);
+ const grass=new T.Mesh(new T.BoxGeometry(2.8,.012,.62),new T.MeshStandardMaterial({color:0x6a8250,roughness:1}));grass.position.set(-.1, .009,4.9);S.add(grass);
+}else if(activeParkId===2){
+ // Mini Ramp Hangar: opposing transitions, extensions, central spine and side street obstacles.
+ quarter(-11.3,.1,12.5,2.25,1);quarter(11.3,.1,12.5,2.25,-1);
+ cappedLedge(0,.15,2.6,12.2,.38);rail('Hangar centre rail',-1.0,-4.8,1.0,-4.8,.62,.62,'round');
+ wedge(-4.1,-6.0,2.1,2.5,0,.58,0xffffff);box(-2.45,-6.0,1.2,2.5,.58,0xffffff);wedge(-1.05,-6.0,1.6,2.5,.58,0,0xffffff);
+ wedge(-4.3,6.1,2.0,2.4,0,.52,0xffffff);box(-2.7,6.1,1.2,2.4,.52,0xffffff);wedge(-1.3,6.1,1.6,2.4,.52,0,0xffffff);
+ rail('Extension rail',-7.2,-5.5,-3.7,-5.5,.72,.72,'flat');rail('Deck edge rail',3.7,5.1,7.2,5.1,.64,.64,'round');
+}else if(activeParkId===3){
+ // Brick District: loading dock, brick curbs, grass gaps, banks, double sets and many technical approaches.
+ wedge(-10.5,1.0,2.5,4.7,0,.68,0xffffff);box(-8.55,1.0,1.3,4.7,.68,0xffffff);wedge(-7.15,1.0,1.5,4.7,.68,0,0xffffff);
+ stairSet(1.7,-3.15,3.1,7,.46,.86,1);rail('Main stair rail',3.55,-3.25,3.55,.55,1.17,.32,'round');rail('Outside stair rail',-.15,-3.25,-.15,.55,1.17,.32,'round');
+ cappedLedge(-3.55,-3.2,4.0,.72,.35);brickDetail(-3.55,-3.58,3.8,.35);rail('Brick curb coping',-5.45,-3.6,-1.65,-3.6,.52,.52,'round');
+ cappedLedge(7.0,1.4,3.8,1.0,.72);rail('Loading dock rail',5.05,.88,8.95,.88,.91,.91,'flat');
+ const grass1=new T.Mesh(new T.BoxGeometry(1.8,.012,.62),new T.MeshStandardMaterial({color:0x718653,roughness:1}));grass1.position.set(-.9, .009,4.6);S.add(grass1);
+ wedge(4.4,5.1,2.4,1.8,0,.5,0xffffff);box(6.0,5.1,.9,1.8,.5,0xffffff);wedge(7.15,5.1,1.4,1.8,.5,0,0xffffff);
+}else if(activeParkId===4){
+ // Concrete Bowl Flow: deep bowl, pool coping, a quarterpipe extension and linked bank/ledge line.
+ quarter(-13.4,-4.6,5.3,1.8,1);box(-10.5,-4.6,2.8,5.3,.9,0xffffff);
+ wedge(-9.0,.8,2.6,4.0,0,.65,0xffffff);box(-7.1,.8,1.2,4.0,.65,0xffffff);wedge(-5.7,.8,1.6,4.0,.65,0,0xffffff);
+ cappedLedge(-2.7,-2.7,3.6,.8,.34);rail('Flow park ledge rail',-4.35,-3.1,-1.05,-3.1,.51,.51,'flat');
+ stairSet(3.0,-3.2,2.8,6,.5,.72,1);rail('Bowl park stair rail',4.55,-3.35,4.55,.5,1.02,.3,'round');
+ wedge(-1.2,5.5,2.4,2.4,0,.58,0xffffff);box(.5,5.5,1.0,2.4,.58,0xffffff);wedge(1.7,5.5,1.4,2.4,.58,0,0xffffff);
+}else if(activeParkId===5){
+ // Blacktop Pro Arena: competition lines, big stair sets, hubbas, banks, spine and bowl.
+ quarter(-14.0,-5.6,5.5,1.75,1);box(-11.1,-5.6,2.8,5.5,.875,0xffffff);
+ wedge(-9.7,.1,2.4,4.7,0,.75,0xffffff);box(-7.8,.1,1.4,4.7,.75,0xffffff);wedge(-6.3,.1,1.6,4.7,.75,0,0xffffff);
+ stairSet(-.8,-3.3,3.0,9,.43,.98,1);rail('Pro stair handrail',.95,-3.45,.95,.85,1.34,.3,'round');rail('Pro second handrail',-2.55,-3.45,-2.55,.85,1.34,.3,'round');
+ cappedLedge(-4.3,4.0,4.2,.82,.48);rail('Pro hubba 1',-6.35,3.56,-2.25,3.56,.64,.64,'flat');
+ cappedLedge(6.4,-2.7,4.0,.82,.62);rail('Pro hubba 2',4.4,-3.12,8.4,-3.12,.79,.79,'round');
+ wedge(3.8,4.3,2.4,2.5,0,.62,0xffffff);box(5.4,4.3,1.0,2.5,.62,0xffffff);wedge(6.6,4.3,1.4,2.5,.62,0,0xffffff);
+ rail('Transfer rail',-5.5,-6.8,-1.8,-6.8,.68,.68,'round');
+}else if(activeParkId===6){
+ // Premium Park: a coordinated all-gold showcase park with a deep bowl and high-end street lines.
+ quarter(-14.1,-5.7,5.5,1.9,1);box(-10.9,-5.7,2.8,5.5,.95,0xffffff);
+ wedge(-10.1,.35,2.4,4.5,0,.76,0xffffff);box(-8.35,.35,1.15,4.5,.76,0xffffff);wedge(-7.0,.35,1.55,4.5,.76,0,0xffffff);
+ cappedLedge(-4.1,-3.25,4.25,.9,.48);rail('Premium gold hubba rail',-6.2,-3.72,-2.0,-3.72,.68,.68,'flat');
+ stairSet(.1,-3.25,3.35,9,.43,1.02,-1);rail('Premium gold stair rail',1.95,-3.38,1.95,.65,1.39,.34,'round');rail('Premium gold outside rail',-1.85,-3.38,-1.85,.65,1.39,.34,'round');
+ wedge(-5.8,4.85,2.1,2.5,0,.62,0xffffff);box(-4.25,4.85,1.15,2.5,.62,0xffffff);wedge(-2.9,4.85,1.55,2.5,.62,0,0xffffff);
+ cappedLedge(-1.0,6.9,3.4,.72,.32);rail('Premium gold ledge slide bar',-2.75,6.52,.75,6.52,.48,.48,'round');
+ rail('Premium bowl-side gold rail',11.2,-2.9,11.2,1.9,.78,.78,'round');
+}
+}
+
+// Build every park as a neighbouring module on one continuous plywood deck.
+// Scene objects are grouped per park; collision data is translated into world coordinates.
+const ALL_P=[],ALL_RL=[];
+const sceneAdd=S.add.bind(S);
+let parkBuildGroup=null;
+S.add=function(...objects){if(parkBuildGroup){parkBuildGroup.add(...objects);return S;}return sceneAdd(...objects)};
+function buildParkZone(id,offsetX){
+ const previousPark=activeParkId;
+ activeParkId=id;premiumBuild=(id===6);
+ P=[];RL=[];parkColorIndex=0;bowlSpec=PARK_CATALOG[id].bowl||null;
+ const group=new T.Group();parkBuildGroup=group;
+ try{
+  addPlywoodBase();
+  buildParkFeatures();
+  buildBowl();
+  if(id>0){
+   const entryLine=new T.Mesh(new T.BoxGeometry(.075,.016,19.55),new T.MeshStandardMaterial({color:0x8e7857,roughness:.88,metalness:.06}));
+   entryLine.position.set(-16.48,.014,0);entryLine.receiveShadow=true;parkBuildGroup.add(entryLine);
+  }
+ }catch(err){
+  console.error('Park module '+PARK_CATALOG[id].name+' failed to build; using a safe deck fallback.',err);
+  parkBuildGroup.clear();P=[];RL=[];bowlSpec=null;parkColorIndex=0;
+  try{addPlywoodBase();}catch(fallbackErr){console.error('Deck fallback failed for '+PARK_CATALOG[id].name,fallbackErr)}
+ }
+ parkBuildGroup=null;premiumBuild=false;
+ group.position.set(offsetX,0,0);
+ sceneAdd(group);
+ for(const item of P){if(typeof item.x==='number')item.x+=offsetX;ALL_P.push(item)}
+ for(const railItem of RL){railItem.x0+=offsetX;railItem.x1+=offsetX;ALL_RL.push(railItem)}
+ activeParkId=previousPark;
+}
+for(let id=0;id<PARK_CATALOG.length;id++)buildParkZone(id,id*PARK_SPACING);
+S.add=sceneAdd;
+P=ALL_P;RL=ALL_RL;
+bowlSpec=null;
+activeParkId=0;
+
+
+// board
+const bd=new T.Group(),dk=new T.Group();bd.rotation.order='YZX';bd.add(dk);S.add(bd);
+const sd=M(0xe8c07a),bt=M(0xffffff,art,{side:T.FrontSide});
+const mats=[sd,sd,sd,bt,sd,sd],met=M(0xaab2b8,null,{metalness:.8,roughness:.35});
+const foam=tex(512,512,(c,w,h)=>{c.fillStyle='#17191c';c.fillRect(0,0,w,h);for(let i=0;i<52000;i++){const a=.035+Math.random()*.12;c.fillStyle=Math.random()<.52?`rgba(255,255,255,${a})`:`rgba(0,0,0,${a*1.4})`;const x=Math.random()*w,y=Math.random()*h;c.fillRect(x,y,Math.random()<.08?2:1,1)}for(let i=0;i<900;i++){c.strokeStyle='rgba(255,255,255,.07)';c.lineWidth=.6;c.beginPath();const x=Math.random()*w,y=Math.random()*h;c.moveTo(x,y);c.lineTo(x+1+Math.random()*2,y+Math.random()*1.5);c.stroke()}},4,1);
+const foamM=new T.MeshStandardMaterial({color:0xffffff,map:foam,bumpMap:foam,bumpScale:.075,roughness:1,metalness:0});
+function bent(L,W,t,r){const g=new T.BoxGeometry(L,t,W,56,1,8),p=g.attributes.position;
+ for(let i=0;i<p.count;i++){const a=Math.abs(p.getX(i)),k=Math.max(0,a-.26)/.24,u=Math.max(0,a-(L/2-r))/r;
+  p.setY(i,p.getY(i)+.085*k*k);p.setZ(i,p.getZ(i)*Math.sqrt(Math.max(.03,1-u*u)))}
+ g.computeVertexNormals();return g}
+function part(g,m,x,y,z){const o=new T.Mesh(g,m);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;o.add(new T.LineSegments(new T.EdgesGeometry(g,35),LM));dk.add(o);return o}
+part(bent(1.0,.36,.026,.18),mats,0,0,0);part(bent(.95,.34,.012,.17),foamM,0,.019,0);
+const wheelMeshes=[],truckMeshes=[];for(const x of[-.28,.28]){truckMeshes.push(part(new T.BoxGeometry(.065,.035,.26),met,x,-.04,0));
+ for(const z of[-.145,.145]){const w=part(new T.CylinderGeometry(.05,.05,.04,28),M(0xf4f1e8,null,{roughness:.82}),x,-.07,z);w.rotation.x=Math.PI/2;wheelMeshes.push(w)}}
+// Twenty original fingerboard setups. Payout multipliers apply to trick and grind cash,
+// separately from the in-combo multiplier that still caps at 2.0x.
+const BOARD_CATALOG=[
+ {id:0,name:'Park Starter',price:0,mult:1.00,mark:'FB',deck:'#262626',accent:'#e1d5bf',wheel:'#e7e1d5',wheelScale:1.00,truck:'#b5b9bb',wheelType:'Classic street · ivory',pattern:'stripe',preview:'linear-gradient(145deg,#262626 0 34%,#e1d5bf 34% 40%,#a33f32 40% 60%,#262626 60%)'},
+ {id:1,name:'Brickline',price:50,mult:1.02,mark:'BRK',deck:'#9d352c',accent:'#f0c58f',wheel:'#d9b58d',wheelScale:.98,truck:'#b9bfc1',wheelType:'52 mm classic · sand',pattern:'split',preview:'linear-gradient(120deg,#9d352c 0 48%,#f0c58f 48% 52%,#27231f 52%)'},
+ {id:2,name:'Pine Static',price:100,mult:1.04,mark:'PINE',deck:'#244b3e',accent:'#d9c9a1',wheel:'#d3ddbd',wheelScale:1.02,truck:'#c0c1b8',wheelType:'52 mm conical · mint',pattern:'grid',preview:'repeating-linear-gradient(90deg,#244b3e 0 9px,#d9c9a1 9px 11px,#315e4e 11px 18px)'},
+ {id:3,name:'Blue Hour',price:150,mult:1.06,mark:'BH',deck:'#193f76',accent:'#79b4d4',wheel:'#4a8eb6',wheelScale:1.02,truck:'#aeb6c1',wheelType:'53 mm street · blue',pattern:'orbit',preview:'radial-gradient(circle at 65% 45%,#79b4d4 0 8%,transparent 9%),linear-gradient(135deg,#193f76,#101b35 60%,#79b4d4)'},
+ {id:4,name:'Sunset Club',price:250,mult:1.08,mark:'SUN',deck:'#d86a43',accent:'#f5d08d',wheel:'#e9a86d',wheelScale:1.00,truck:'#b5a69a',wheelType:'54 mm soft street · amber',pattern:'sun',preview:'radial-gradient(circle at 50% 50%,#f5d08d 0 17%,transparent 18%),linear-gradient(120deg,#d86a43,#9b3b36)'},
+ {id:5,name:'Checkmate',price:350,mult:1.10,mark:'CHECK',deck:'#232323',accent:'#f0eee7',wheel:'#f0eee7',wheelScale:.96,truck:'#9ca2a5',wheelType:'52 mm slim · white',pattern:'checker',preview:'repeating-conic-gradient(#f0eee7 0 25%,#232323 0 50%) 50% / 18px 18px'},
+ {id:6,name:'Acid Bloom',price:500,mult:1.12,mark:'BLOOM',deck:'#526b2d',accent:'#d6e34c',wheel:'#c8dc47',wheelScale:1.04,truck:'#aeb3a5',wheelType:'54 mm wide · lime',pattern:'bloom',preview:'radial-gradient(circle at 50% 50%,#d6e34c 0 12%,transparent 13%),repeating-radial-gradient(circle,#526b2d 0 6px,#d6e34c 7px 8px)'},
+ {id:7,name:'Concrete Angel',price:700,mult:1.14,mark:'CA',deck:'#777b7c',accent:'#e7e2d9',wheel:'#e4e0d8',wheelScale:1.06,truck:'#d3d5d2',wheelType:'54 mm cruiser · chalk',pattern:'concrete',preview:'repeating-linear-gradient(18deg,#777b7c 0 8px,#8e9290 8px 10px,#e7e2d9 10px 11px)'},
+ {id:8,name:'Split Decision',price:950,mult:1.17,mark:'SPLIT',deck:'#282a35',accent:'#e69b43',wheel:'#e69b43',wheelScale:1.02,truck:'#9c9da4',wheelType:'53 mm dual durometer · orange',pattern:'split2',preview:'linear-gradient(90deg,#282a35 0 49%,#e69b43 49% 51%,#e9e4d8 51% 100%)'},
+ {id:9,name:'Cherry Bomb',price:1200,mult:1.20,mark:'CHERRY',deck:'#7f1f36',accent:'#f5c5c4',wheel:'#e8b0b2',wheelScale:1.06,truck:'#b6a3a3',wheelType:'55 mm conical · rose',pattern:'burst',preview:'repeating-conic-gradient(from 10deg,#7f1f36 0 12deg,#f5c5c4 13deg 19deg)'},
+ {id:10,name:'Night Shift',price:1500,mult:1.23,mark:'NIGHT',deck:'#101820',accent:'#62c7b4',wheel:'#50bca8',wheelScale:1.04,truck:'#6c7b7b',wheelType:'54 mm street · teal',pattern:'night',preview:'radial-gradient(ellipse at 50% 50%,#62c7b4 0 7%,transparent 8%),repeating-linear-gradient(135deg,#101820 0 8px,#244943 8px 10px)'},
+ {id:11,name:'Gold Rush',price:1800,mult:1.27,mark:'GOLD',deck:'#7c5525',accent:'#f0cf79',wheel:'#e9c56c',wheelScale:1.05,truck:'#d1b879',wheelType:'54 mm wide · gold urethane',pattern:'gold',preview:'linear-gradient(135deg,#7c5525 0 30%,#f0cf79 30% 37%,#382b1b 37% 63%,#f0cf79 63% 70%,#7c5525 70%)'},
+ {id:12,name:'Tiger Bloom',price:2200,mult:1.32,mark:'TIGER',deck:'#e2a42c',accent:'#26221d',wheel:'#252525',wheelScale:1.08,truck:'#b7a36f',wheelType:'55 mm conical · black',pattern:'tiger',preview:'repeating-linear-gradient(125deg,#e2a42c 0 12px,#26221d 12px 18px,#e2a42c 18px 27px)'},
+ {id:13,name:'Holo Static',price:2700,mult:1.37,mark:'HOLO',deck:'#566a83',accent:'#c5d1dc',wheel:'#c4d7dc',wheelScale:1.07,truck:'#c8d1d4',wheelType:'55 mm radial · ice',pattern:'holo',preview:'linear-gradient(115deg,#566a83,#c5d1dc 30%,#a879a5 55%,#76b5aa 80%,#566a83)'},
+ {id:14,name:'Phantom Press',price:3200,mult:1.43,mark:'PHANTOM',deck:'#171923',accent:'#a8a3d6',wheel:'#9e9bc9',wheelScale:1.08,truck:'#8d8ba8',wheelType:'55 mm slim conical · violet',pattern:'phantom',preview:'radial-gradient(ellipse at 50% 50%,#a8a3d6 0 5%,transparent 6%),linear-gradient(90deg,#171923,#403b60,#171923)'},
+ {id:15,name:'Dragon Fruit',price:3800,mult:1.50,mark:'DRAGON',deck:'#43244a',accent:'#e95b8b',wheel:'#e85e8a',wheelScale:1.10,truck:'#b08c9e',wheelType:'56 mm wide · pink core',pattern:'dragon',preview:'radial-gradient(ellipse at 20% 50%,#e95b8b 0 13%,transparent 14%),linear-gradient(135deg,#43244a,#1c2638 60%,#e95b8b)'},
+ {id:16,name:'Blacktop Pro',price:4500,mult:1.58,mark:'BT PRO',deck:'#181817',accent:'#eee6d6',wheel:'#ded6c5',wheelScale:1.10,truck:'#ddd8ca',wheelType:'56 mm performance · natural',pattern:'pro',preview:'linear-gradient(90deg,#181817 0 22%,#eee6d6 22% 25%,#181817 25% 75%,#eee6d6 75% 78%,#181817 78%)'},
+ {id:17,name:'Liquid Chrome',price:5300,mult:1.67,mark:'CHROME',deck:'#56616a',accent:'#e2edf1',wheel:'#cbd5dc',wheelScale:1.12,truck:'#dce4e7',wheelType:'56 mm hollow core · silver',pattern:'chrome',preview:'linear-gradient(120deg,#56616a,#e2edf1 24%,#8aa2ad 42%,#eef2f1 56%,#56616a 78%)'},
+ {id:18,name:'Ghost Series',price:6200,mult:1.78,mark:'GHOST',deck:'#d8d9d3',accent:'#303b42',wheel:'#303b42',wheelScale:1.12,truck:'#d4d7d4',wheelType:'56 mm pro conical · smoke',pattern:'ghost',preview:'linear-gradient(135deg,#d8d9d3 0 40%,#303b42 40% 44%,#edf0e9 44% 60%,#303b42 60% 64%,#d8d9d3 64%)'},
+ {id:19,name:'Afterhours Pro Model',price:7200,mult:1.90,mark:'AFTERHOURS',deck:'#11131c',accent:'#e2b85c',wheel:'#e0b65d',wheelScale:1.15,truck:'#e0c17b',wheelType:'57 mm signature core · gold',pattern:'after',preview:'radial-gradient(circle at 50% 50%,#e2b85c 0 5%,transparent 6%),repeating-radial-gradient(circle at 50% 50%,#11131c 0 7px,#7d642e 8px 9px,#11131c 10px 14px)'},
+ {id:20,name:'Premium Finger Board',price:250000,mult:2.50,mark:'PREMIUM',deck:'#d5aa32',accent:'#fff0a4',wheel:'#e8c34e',wheelScale:1.17,truck:'#f0cc58',wheelType:'57 mm full-gold signature wheels · polished gold trucks',pattern:'premiumGold',preview:'linear-gradient(115deg,#866012 0%,#fbe992 18%,#bd8b16 35%,#fff4b5 50%,#c99b27 67%,#f4df88 83%,#805c0d 100%)'}
+];
+function drawBoardGraphic(b){
+ const canvas=art.image,c=canvas.getContext('2d'),w=canvas.width,h=canvas.height;
+ c.clearRect(0,0,w,h);
+ const grad=c.createLinearGradient(0,0,w,h);grad.addColorStop(0,b.deck);grad.addColorStop(1,b.accent);c.fillStyle=grad;c.fillRect(0,0,w,h);
+ c.save();
+ switch(b.pattern){
+  case 'stripe': case 'pro': case 'chrome':
+   for(let i=-h;i<w+h;i+=25){c.fillStyle=i%50===0?b.accent:'rgba(255,255,255,.15)';c.beginPath();c.moveTo(i,0);c.lineTo(i+12,0);c.lineTo(i-h+12,h);c.lineTo(i-h,h);c.closePath();c.fill()}break;
+  case 'split': case 'split2':
+   c.fillStyle=b.accent;c.fillRect(w*.48,0,w*.06,h);c.fillStyle='rgba(0,0,0,.2)';c.fillRect(w*.5,0,w*.5,h);break;
+  case 'grid': case 'night':
+   c.strokeStyle=b.accent;c.globalAlpha=.55;c.lineWidth=3;for(let x=0;x<w;x+=30){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke()}for(let y=0;y<h;y+=24){c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke()}break;
+  case 'orbit': case 'phantom': case 'ghost': case 'after':
+   c.strokeStyle=b.accent;c.lineWidth=5;for(let i=0;i<7;i++){c.beginPath();c.ellipse(w*.5,h*.5,20+i*18,8+i*9,(i%2)*.4,0,Math.PI*2);c.stroke()}c.fillStyle=b.accent;c.beginPath();c.arc(w*.5,h*.5,9,0,Math.PI*2);c.fill();break;
+  case 'sun': case 'burst':
+   c.strokeStyle=b.accent;c.lineWidth=5;for(let i=0;i<24;i++){const a=i*Math.PI/12;c.beginPath();c.moveTo(w*.5+Math.cos(a)*12,h*.5+Math.sin(a)*12);c.lineTo(w*.5+Math.cos(a)*180,h*.5+Math.sin(a)*100);c.stroke()}c.fillStyle=b.deck;c.beginPath();c.arc(w*.5,h*.5,24,0,Math.PI*2);c.fill();break;
+  case 'checker':
+   for(let y=0;y<h;y+=24)for(let x=0;x<w;x+=24)if((x/24+y/24)%2===0){c.fillStyle=b.accent;c.fillRect(x,y,24,24)}break;
+  case 'bloom': case 'dragon':
+   for(let i=0;i<10;i++){c.strokeStyle=b.accent;c.lineWidth=6;c.beginPath();c.ellipse(w*.5,h*.5,18+i*13,7+i*6,i*.28,0,Math.PI*2);c.stroke()}break;
+  case 'concrete': case 'gold':
+   c.strokeStyle=b.accent;c.lineWidth=4;for(let y=14;y<h;y+=28){c.beginPath();c.moveTo(0,y);c.lineTo(w,y-18);c.stroke()}break;
+  case 'premiumGold':
+   for(let i=0;i<18;i++){const yy=h*.08+i*h*.052;c.strokeStyle=i%2?'rgba(255,248,202,.54)':'rgba(111,75,8,.35)';c.lineWidth=i%3===0?4:1.5;c.beginPath();c.moveTo(w*.08,yy);c.lineTo(w*.92,yy);c.stroke()}
+   c.strokeStyle='rgba(255,246,190,.9)';c.lineWidth=4;for(let i=0;i<4;i++){c.beginPath();c.ellipse(w*.5,h*.5,30+i*27,12+i*11,0,0,Math.PI*2);c.stroke()}
+   c.fillStyle='rgba(255,245,184,.5)';c.fillRect(w*.12,h*.08,w*.76,h*.045);break;
+  case 'tiger': case 'holo':
+   for(let i=-h;i<w+h;i+=22){c.fillStyle=i%44===0?b.accent:'rgba(255,255,255,.2)';c.beginPath();c.moveTo(i,0);c.lineTo(i+11,0);c.lineTo(i-h+11,h);c.lineTo(i-h,h);c.closePath();c.fill()}break;
+  case 'chrome':
+   c.fillStyle='rgba(255,255,255,.35)';c.fillRect(0,h*.22,w,h*.12);c.fillRect(0,h*.67,w,h*.08);break;
+  default:
+   c.strokeStyle=b.accent;c.lineWidth=4;for(let y=18;y<h;y+=25){c.beginPath();c.moveTo(0,y);for(let x=0;x<=w;x+=8)c.lineTo(x,y+Math.sin(x/18+y)*6);c.stroke()}
+ }
+ c.restore();
+ c.strokeStyle='rgba(255,255,255,.72)';c.lineWidth=5;c.strokeRect(4,4,w-8,h-8);
+ c.fillStyle='rgba(0,0,0,.5)';c.fillRect(w*.24,h*.36,w*.52,h*.28);
+ c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';c.font='bold 23px Arial';c.fillText(b.mark,w*.5,h*.5);
+ c.fillStyle='rgba(255,255,255,.85)';c.font='bold 8px Arial';c.fillText('FINGERBOARD SERIES',w*.5,h*.18);
+ art.needsUpdate=true;
+}
+// A proportioned hand: two relaxed riding fingers, a compact palm and a natural thumb.
+const hnd=new T.Group();bd.add(hnd);
+const V3=T.Vector3,Y3=new V3(0,1,0);
+const sk=tex(256,256,(c,w,h)=>{c.fillStyle='#dca58a';c.fillRect(0,0,w,h);for(let i=0;i<5200;i++){const a=.025+Math.random()*.09;c.fillStyle=Math.random()<.55?`rgba(130,70,55,${a})`:`rgba(255,225,205,${a})`;const x=Math.random()*w,y=Math.random()*h;c.fillRect(x,y,1+Math.random()*1.5,1+Math.random()*1.5)}},1,1);
+const SK=new T.MeshStandardMaterial({color:0xffffff,map:sk,bumpMap:sk,bumpScale:.018,roughness:.76,metalness:0});
+const nailMat=new T.MeshStandardMaterial({color:0xe9c7b9,roughness:.42,metalness:0});
+function handEllipsoid(x,y,z,sx,sy,sz,mat=SK){const m=new T.Mesh(new T.SphereGeometry(1,28,20),mat);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=true;m.receiveShadow=true;hnd.add(m);return m}
+function handSegment(a,b,rA,rB){const d=b.clone().sub(a),len=d.length();const m=new T.Mesh(new T.CylinderGeometry(rB,rA,len,20,1),SK);m.position.copy(a).add(b).multiplyScalar(.5);m.quaternion.setFromUnitVectors(Y3,d.normalize());m.castShadow=true;m.receiveShadow=true;hnd.add(m);handEllipsoid(a.x,a.y,a.z,rA,rA,rA);handEllipsoid(b.x,b.y,b.z,rB,rB,rB);return m}
+function fingerPath(points,radii){for(let i=0;i<points.length-1;i++)handSegment(points[i],points[i+1],radii[i],radii[i+1])}
+// Wrist and palm sit behind the deck; their narrower shape avoids the old oversized blob.
+handEllipsoid(-.76,.158,0,.205,.082,.135);
+handEllipsoid(-.43,.195,0,.285,.105,.178);
+// Soft knuckles at the base of the two riding fingers.
+handEllipsoid(-.245,.204,-.073,.075,.057,.052);
+handEllipsoid(-.335,.202,.062,.073,.054,.052);
+// Index finger, slightly longer and set toward the nose.
+fingerPath([
+ new V3(-.245,.205,-.073),new V3(-.055,.188,-.075),new V3(.145,.139,-.075),new V3(.365,.092,-.075)
+],[.046,.043,.036,.031]);
+// Middle finger, shorter and offset so the fingertips do not look like matching pegs.
+fingerPath([
+ new V3(-.335,.202,.062),new V3(-.185,.181,.063),new V3(-.015,.137,.063),new V3(.185,.092,.063)
+],[.046,.042,.035,.03]);
+// Small natural nails on the top side of the fingertips.
+handEllipsoid(.337,.113,-.075,.043,.009,.026,nailMat).rotation.z=-.16;
+handEllipsoid(.159,.112,.063,.039,.009,.025,nailMat).rotation.z=-.12;
+// Thumb curves around the near edge of the deck.
+fingerPath([
+ new V3(-.40,.184,.125),new V3(-.235,.139,.177),new V3(-.075,.092,.151)
+],[.061,.049,.036]);
+handEllipsoid(-.074,.105,.151,.038,.026,.034);
+// A restrained crease tint gives the knuckles a little depth without heavy outlines.
+const creaseMat=new T.MeshBasicMaterial({color:0x9d6558,transparent:true,opacity:.18});
+for(const p of [[-.08,.185,-.075],[-.21,.179,.063]]){const crease=new T.Mesh(new T.TorusGeometry(.027,.0025,4,16,Math.PI),creaseMat);crease.position.set(p[0],p[1]+.01,p[2]);crease.rotation.x=Math.PI/2;hnd.add(crease)}
+
+// Small metal-grind sparks, emitted only while locked to a rail.
+const SPARK_COUNT=36,sparkPositions=new Float32Array(SPARK_COUNT*3),sparkVelocities=Array.from({length:SPARK_COUNT},()=>new T.Vector3()),sparkLives=new Float32Array(SPARK_COUNT);
+const sparkGeometry=new T.BufferGeometry();sparkGeometry.setAttribute('position',new T.BufferAttribute(sparkPositions,3));
+const sparkMaterial=new T.PointsMaterial({color:0xffdf83,size:.065,transparent:true,opacity:.95,depthWrite:false,sizeAttenuation:true});
+const sparkCloud=new T.Points(sparkGeometry,sparkMaterial);sparkCloud.frustumCulled=false;S.add(sparkCloud);
+let sparkCursor=0,sparkClock=0;
+function spawnSpark(x,y,z){const i=sparkCursor++%SPARK_COUNT;sparkPositions[i*3]=x;sparkPositions[i*3+1]=y;sparkPositions[i*3+2]=z;sparkVelocities[i].set((Math.random()-.5)*2.2,.8+Math.random()*2.1,(Math.random()-.5)*2.2);sparkLives[i]=.18+Math.random()*.22;sparkGeometry.attributes.position.needsUpdate=true}
+function updateSparks(dt){let active=false;for(let i=0;i<SPARK_COUNT;i++){if(sparkLives[i]<=0)continue;active=true;sparkLives[i]-=dt;const v=sparkVelocities[i];sparkPositions[i*3]+=v.x*dt;sparkPositions[i*3+1]+=v.y*dt;sparkPositions[i*3+2]+=v.z*dt;v.y-=5*dt;if(sparkLives[i]<=0){sparkPositions[i*3+1]=-100}}if(active)sparkGeometry.attributes.position.needsUpdate=true}
+// state
+const TR={kick:['Kickflip',150,.55,1,0],heel:['Heelflip',150,.55,-1,0],pop:['Pop shove-it',100,.5,0,.5],fs:['FS shove-it',120,.5,0,-.5],var:['Varial flip',250,.62,1,.5],hard:['Hardflip',350,.68,1,-.5],inw:['Inward heelflip',250,.62,-1,-.5],laser:['Laser flip',400,.72,-1,1],tre:['360 flip',400,.72,1,1],bigs:['Bigspin',200,.7,0,1],fsbs:['FS bigspin',220,.7,0,-1],bflip:['Bigflip',450,.75,1,-1],bheel:['Bigspin heelflip',450,.75,-1,1],imp:['Impossible',500,.75,0,0,1],frontkick:['Frontside kickflip',360,.74,1,-1.5],backheel:['Backside heelflip',380,.74,-1,1.5],dolphin:['Dolphin flip',420,.74,0,0,1.5],pressure:['Pressure flip',430,.74,-1,0,-.75],dragon:['Dragon flip',560,.74,1,.5,1.5],gazelle:['Gazelle flip',600,.74,1,2]};
+const LK={KeyQ:'bigs',KeyE:'fsbs',KeyF:'bflip',KeyG:'bheel',KeyT:'imp',KeyH:'frontkick',KeyJ:'backheel',KeyK:'dolphin',KeyL:'pressure',KeyV:'dragon',KeyB:'gazelle'};
+const GRIND_STYLES=[
+ {name:'50-50',angle:0,align:'parallel',contact:0,pitch:0,roll:0,rate:165},
+ {name:'5-0',angle:0,align:'parallel',contact:-.2,pitch:.08,roll:0,rate:185},
+ {name:'Nosegrind',angle:0,align:'parallel',contact:.28,pitch:-.09,roll:0,rate:195},
+ {name:'Tailgrind',angle:0,align:'parallel',contact:-.28,pitch:.12,roll:0,rate:195},
+ {name:'Boardslide',angle:Math.PI/2,align:'perp',contact:0,pitch:0,roll:.06,rate:175},
+ {name:'Lipslide',angle:Math.PI/2,align:'perp',contact:0,pitch:-.1,roll:-.08,rate:195},
+ {name:'Bluntslide',angle:Math.PI/2,align:'perp',contact:-.3,pitch:.2,roll:.1,rate:220},
+ {name:'Noseblunt',angle:Math.PI/2,align:'perp',contact:.3,pitch:-.2,roll:-.1,rate:225},
+ {name:'Crooked grind',angle:.28,align:'angled',contact:.14,pitch:-.06,roll:.15,rate:215},
+ {name:'Smith grind',angle:.34,align:'angled',contact:-.14,pitch:.08,roll:-.16,rate:220},
+ {name:'Feeble grind',angle:-.34,align:'angled',contact:.14,pitch:.08,roll:.16,rate:220},
+ {name:'Overcrook',angle:-.28,align:'angled',contact:-.14,pitch:-.08,roll:-.15,rate:225},
+ {name:'Noseslide',angle:Math.PI/2,align:'perp',contact:.3,pitch:-.1,roll:0,rate:185},
+ {name:'Tailslide',angle:Math.PI/2,align:'perp',contact:-.3,pitch:.1,roll:0,rate:185}
+];
+let grindStyleIndex=0;
+const GRIND_KEYS={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Digit5:4,Digit6:5,Digit7:6,Digit8:7,Digit9:8,Digit0:9,Minus:10,Equal:11,BracketLeft:12,BracketRight:13};
+let X,Y,Z,th,v,vy,vx,vz,gvy,air,grind,trick,manual,state,bailT,spin,pit=0,ct=0,pop=0,score=0,cash=0,comboMultiplier=1.0,comboLinks=0,go=0,combo,keys={};
+try{cash=Math.max(0,Math.floor(Number(localStorage.getItem('fingerboardParkCash'))||0))}catch(e){}
+function saveCash(){try{localStorage.setItem('fingerboardParkCash',String(Math.floor(cash)))}catch(e){}}
+let ownedBoardIds=[0],currentBoardId=0,shopOpen=false,parkShopOpen=false;
+try{const savedOwned=JSON.parse(localStorage.getItem('fingerboardParkOwnedBoards')||'[0]');if(Array.isArray(savedOwned))ownedBoardIds=[...new Set([0,...savedOwned.map(Number).filter(n=>Number.isInteger(n)&&n>=0&&n<BOARD_CATALOG.length)])]}catch(e){}
+try{const savedBoard=Number(localStorage.getItem('fingerboardParkSelectedBoard'));if(ownedBoardIds.includes(savedBoard))currentBoardId=savedBoard}catch(e){}
+function saveBoardData(){try{localStorage.setItem('fingerboardParkOwnedBoards',JSON.stringify(ownedBoardIds));localStorage.setItem('fingerboardParkSelectedBoard',String(currentBoardId))}catch(e){}}
+function applyBoard(id){
+ const b=BOARD_CATALOG.find(x=>x.id===id);if(!b)return;
+ currentBoardId=id;drawBoardGraphic(b);
+ const isPremium=id===20;
+ sd.color.set(isPremium?0xc69a27:0xe8c07a);sd.metalness=isPremium?.52:0;sd.roughness=isPremium?.32:.65;
+ foamM.map=isPremium?goldGrip:foam;foamM.bumpMap=isPremium?goldGrip:foam;foamM.color.set(0xffffff);foamM.bumpScale=isPremium?.035:.075;foamM.roughness=isPremium?.48:1;foamM.metalness=isPremium?.28:0;foamM.needsUpdate=true;
+ wheelMeshes.forEach(w=>{const widthScale=b.wheelScale>1.08?1.12:(b.wheelScale<.99?.9:1);w.material.color.set(b.wheel);w.material.roughness=isPremium?.23:(b.wheelScale>1.08?.55:.78);w.material.metalness=isPremium?.72:0;w.scale.set(b.wheelScale,widthScale,b.wheelScale)});
+ truckMeshes.forEach(t=>{t.material.color.set(b.truck);t.material.metalness=isPremium?.92:.8;t.material.roughness=isPremium?.2:.35;t.scale.z=b.wheelScale});
+ const btn=document.getElementById('shopBtn');if(btn)btn.textContent='BOARD SHOP · '+b.name.toUpperCase();
+ const label=document.getElementById('deckPayoutVal');if(label)label.textContent='CURRENT DECK · '+b.mult.toFixed(2)+'× CASH BONUS';
+ saveBoardData();
+}
+function renderShop(){
+ const grid=document.getElementById('shopGrid'),stats=document.getElementById('shopStats');if(!grid||!stats)return;
+ const active=BOARD_CATALOG[currentBoardId],ownedCount=ownedBoardIds.length;
+ stats.textContent='$'+Math.floor(cash).toLocaleString()+' WALLET · '+ownedCount+'/'+BOARD_CATALOG.length+' OWNED · USING '+active.mult.toFixed(2)+'× DECK';
+ grid.innerHTML=BOARD_CATALOG.map(b=>{
+  const owned=ownedBoardIds.includes(b.id),equipped=currentBoardId===b.id;
+  const label=equipped?'EQUIPPED':owned?'EQUIP':'BUY · $'+b.price.toLocaleString();
+  const disabled=equipped||( !owned&&cash<b.price );
+  const buttonClass=!owned&&cash<b.price?' class="cant"':'';
+  return `<article class="boardCard"><div class="boardPreview" style="--wheel:${b.wheel};--wheel-scale:${b.wheelScale}"><span class="miniWheel"></span><div class="miniDeck" style="background:${b.preview}"><span>${b.mark}</span></div><span class="miniWheel"></span></div><div class="boardName">${b.id+1}. ${b.name}</div><div class="boardMeta">${b.wheelType}<br>${b.mult.toFixed(2)}× trick + grind cash</div><div class="boardPrice">${b.price===0?'STARTER SETUP':'PRICE · $'+b.price.toLocaleString()}</div><button data-board-id="${b.id}"${disabled?' disabled':''}${buttonClass}>${label}</button></article>`;
+ }).join('');
+}
+const shopBtn=document.getElementById('shopBtn'),shopPanel=document.getElementById('shopPanel'),shopGrid=document.getElementById('shopGrid');
+const parkShopBtn=document.getElementById('parkShopBtn'),parkShopPanel=document.getElementById('parkShopPanel'),parkShopGrid=document.getElementById('parkShopGrid');
+const codeBtn=document.getElementById('codeBtn'),codePanel=document.getElementById('codePanel'),codeInput=document.getElementById('codeInput'),codeMessage=document.getElementById('codeMessage');
+let redeemedCodes=[];
+try{const savedCodes=JSON.parse(localStorage.getItem('fingerboardParkRedeemedCodes')||'[]');if(Array.isArray(savedCodes))redeemedCodes=[...new Set(savedCodes.map(v=>String(v).toLowerCase()))]}catch(e){}
+function closeCodePanel(){codePanel.style.display='none'}
+function redeemGameCode(){
+ const code=codeInput.value.trim().toLowerCase();
+ if(!code){codeMessage.style.color='#e5b2a5';codeMessage.textContent='ENTER A CODE FIRST';return}
+ if(code!=='dangerdan'){codeMessage.style.color='#e5b2a5';codeMessage.textContent='INVALID CODE';return}
+ if(redeemedCodes.includes(code)){codeMessage.style.color='#e5b2a5';codeMessage.textContent='THIS CODE HAS ALREADY BEEN USED';return}
+ redeemedCodes.push(code);
+ try{localStorage.setItem('fingerboardParkRedeemedCodes',JSON.stringify(redeemedCodes))}catch(e){}
+ cash+=50000;saveCash();
+ codeMessage.style.color='#d6edaa';codeMessage.textContent='SUCCESS! $50,000 ADDED TO YOUR WALLET';
+ codeInput.value='';
+ if(shopOpen)renderShop();if(parkShopOpen)renderParkShop();
+ say('CODE REDEEMED · +$50,000',false);
+}
+codeBtn.addEventListener('click',()=>{shopOpen=false;shopPanel.style.display='none';parkShopOpen=false;parkShopPanel.style.display='none';codePanel.style.display='flex';codeMessage.textContent='';codeMessage.style.color='#d6edaa';codeInput.focus()});
+document.getElementById('codeClose').addEventListener('click',closeCodePanel);
+document.getElementById('redeemSubmit').addEventListener('click',redeemGameCode);
+codeInput.addEventListener('keydown',e=>{if(e.key==='Enter')redeemGameCode()});
+codePanel.addEventListener('pointerdown',e=>{if(e.target===codePanel)closeCodePanel();e.stopPropagation()});
+
+shopBtn.addEventListener('click',()=>{parkShopOpen=false;parkShopPanel.style.display='none';shopOpen=true;shopPanel.style.display='flex';renderShop()});
+document.getElementById('shopClose').addEventListener('click',()=>{shopOpen=false;shopPanel.style.display='none'});
+shopGrid.addEventListener('click',e=>{
+ const button=e.target.closest('button[data-board-id]');if(!button)return;
+ const id=Number(button.dataset.boardId),b=BOARD_CATALOG.find(x=>x.id===id);if(!b)return;
+ if(ownedBoardIds.includes(id)){applyBoard(id);say('EQUIPPED · '+b.name,false)}
+ else if(cash>=b.price){cash-=b.price;ownedBoardIds.push(id);applyBoard(id);saveCash();say('PURCHASED · '+b.name+' · -$'+b.price.toLocaleString(),false)}
+ else{say('NEED $'+(b.price-cash).toLocaleString()+' MORE',true)}
+ renderShop();
+});
+function renderParkShop(){
+ const grid=document.getElementById('parkShopGrid'),stats=document.getElementById('parkShopStats');if(!grid||!stats)return;
+ activeParkId=parkAtX(X);
+ const active=PARK_CATALOG[activeParkId];stats.textContent='$'+Math.floor(cash).toLocaleString()+' WALLET · '+ownedParkIds.length+'/'+PARK_CATALOG.length+' OWNED · NEAR '+active.name.toUpperCase();
+ grid.innerHTML=PARK_CATALOG.map(p=>{const owned=ownedParkIds.includes(p.id),selected=activeParkId===p.id;const label=selected?'YOU ARE HERE':owned?'GO TO PARK':'GO TO GATE';let thumb='';
+  if(p.thumb==='starter')thumb='<i class="feature quarter" style="left:10px;bottom:12px"></i><i class="feature stairs" style="left:82px;bottom:10px"></i><i class="feature bowl" style="right:9px;top:14px"></i><i class="feature rail" style="left:90px;top:22px;width:65px;transform:rotate(-14deg)"></i>';
+  else if(p.thumb==='street')thumb='<i class="feature stairs" style="left:83px;bottom:11px"></i><i class="feature rail" style="left:96px;top:31px;width:64px;transform:rotate(-18deg)"></i><i class="feature box" style="left:12px;top:18px"></i><i class="feature brick" style="right:10px;bottom:16px"></i>';
+  else if(p.thumb==='mini')thumb='<i class="feature quarter" style="left:5px;bottom:10px;transform:scaleX(1.15)"></i><i class="feature quarter" style="right:5px;bottom:10px;transform:scaleX(-1.15)"></i><i class="feature rail" style="left:75px;top:48px;width:80px"></i>';
+  else if(p.thumb==='brick')thumb='<i class="feature brick" style="left:14px;top:20px"></i><i class="feature stairs" style="left:96px;bottom:10px"></i><i class="feature box" style="right:10px;top:14px"></i><i class="feature rail" style="left:99px;top:45px;width:65px"></i>';
+  else if(p.thumb==='bowl')thumb='<i class="feature bowl" style="left:56px;top:30px;width:100px;height:64px"></i><i class="feature quarter" style="left:8px;top:11px"></i><i class="feature rail" style="right:8px;top:17px;width:65px;transform:rotate(20deg)"></i>';
+  else if(p.thumb==='premium')thumb='<i class="feature bowl" style="left:72px;top:22px;width:105px;height:70px;background:radial-gradient(ellipse,#8e6818 0 35%,#e8c64e 36% 48%,#fff0a6 49% 53%,#a97d18 54%)"></i><i class="feature stairs" style="left:8px;bottom:9px;background:repeating-linear-gradient(0deg,#f1d36b 0 7px,#9d761d 7px 9px)"></i><i class="feature rail" style="left:12px;top:21px;width:64px;background:#ffe17a"></i><i class="feature box" style="right:8px;bottom:9px;background:linear-gradient(135deg,#ffeaa0,#b3871e)"></i>';
+  else thumb='<i class="feature bowl" style="left:80px;top:24px;width:90px;height:62px"></i><i class="feature stairs" style="left:8px;bottom:9px"></i><i class="feature rail" style="left:16px;top:25px;width:66px;transform:rotate(-13deg)"></i><i class="feature box" style="right:7px;bottom:10px"></i>';
+  return `<article class="parkCard"><div class="parkThumb">${thumb}</div><div class="parkName">${p.id===0?'STARTER · ':''}${p.name}</div><div class="parkMeta"><b>${p.theme}</b><br>${p.desc}<br><span style="color:#d8c29a">${p.features}</span></div><div class="parkPrice">${p.price===0?'INCLUDED WITH YOUR GAME':owned?'UNLOCKED':'GATE PRICE · $'+p.price.toLocaleString()}</div><button data-park-id="${p.id}">${label}</button></article>`;
+ }).join('');
+}
+function moveToParkApproach(id){
+ const start=parkStartX(id),owned=ownedParkIds.includes(id);
+ shopOpen=false;shopPanel.style.display='none';parkShopOpen=false;parkShopPanel.style.display='none';
+ X=owned?start+1.7:start-.95;Z=-8.65;th=0;v=0;vx=0;vz=0;vy=0;gvy=0;air=false;grind=null;trick=null;manual=false;state='play';Y=H(X,Z);pit=0;pop=0;keys={};
+ activeParkId=id;cam.position.set(X-cameraDistance,Y+cameraHeight,Z-1.05);
+ say(owned?'ENTERING '+PARK_CATALOG[id].name.toUpperCase():'PARK GATE AHEAD · RIDE FORWARD TO UNLOCK '+PARK_CATALOG[id].name.toUpperCase(),false);
+}
+parkShopBtn.addEventListener('click',()=>{shopOpen=false;shopPanel.style.display='none';parkShopOpen=true;parkShopPanel.style.display='flex';renderParkShop()});
+document.getElementById('parkShopClose').addEventListener('click',()=>{parkShopOpen=false;parkShopPanel.style.display='none'});
+parkShopGrid.addEventListener('click',e=>{const button=e.target.closest('button[data-park-id]');if(!button)return;const id=Number(button.dataset.parkId);if(!PARK_CATALOG.some(p=>p.id===id))return;moveToParkApproach(id)});
+shopPanel.addEventListener('pointerdown',e=>e.stopPropagation());parkShopPanel.addEventListener('pointerdown',e=>e.stopPropagation());
+addEventListener('keydown',e=>{if(e.code==='Escape'){if(parkGateOpen){denyParkGate();return}if(shopOpen){shopOpen=false;shopPanel.style.display='none'}if(parkShopOpen){parkShopOpen=false;parkShopPanel.style.display='none'}if(codePanel.style.display==='flex')closeCodePanel()}});
+shopBtn.textContent='BOARD SHOP · '+BOARD_CATALOG[currentBoardId].name.toUpperCase();parkShopBtn.textContent='PARK MAP';
+applyBoard(currentBoardId);
+let cameraDistance=3.35,cameraHeight=2.0;
+function respawn(){X=-15.1;Z=-8.65;th=0;v=0;vy=vx=vz=gvy=0;air=false;grind=null;trick=null;manual=false;state='play';Y=H(X,Z);pit=0;ct=0;pop=0;combo={pts:0,n:0,names:[],t:0,m:0};comboMultiplier=1.0;comboLinks=0;dk.rotation.set(0,0,0);bd.rotation.set(0,0,0);cam.position.set(X-cameraDistance,Y+cameraHeight,Z-1.05)}
+respawn();
+const ts=document.getElementById('ts');let tt;
+function say(s,bad){ts.textContent=s;ts.style.color=bad?'#ff7a8f':'#fff';ts.style.opacity=1;clearTimeout(tt);tt=setTimeout(()=>ts.style.opacity=0,1600)}
+const parkGatePanel=document.getElementById('parkGatePanel'),gateTitle=document.getElementById('gateTitle'),gateDescription=document.getElementById('gateDescription'),gatePrice=document.getElementById('gatePrice'),gateMessage=document.getElementById('gateMessage'),gateConfirm=document.getElementById('gateConfirm');
+let parkGateOpen=false,parkGatePending=null;
+function openParkGate(id){
+ const p=PARK_CATALOG[id];if(!p||ownedParkIds.includes(id)||parkGateOpen)return;
+ parkGatePending=id;parkGateOpen=true;keys={};trick=null;grind=null;manual=false;air=false;v=0;vx=0;vz=0;vy=0;gvy=0;Y=Math.max(0,H(X,Z));
+ gateTitle.textContent='UNLOCK '+p.name.toUpperCase()+'?';
+ gateDescription.textContent=p.desc+' Buy permanent access for this park? Once unlocked, you can ride here any time.';
+ gatePrice.textContent='$'+p.price.toLocaleString();gateConfirm.textContent='CONFIRM · $'+p.price.toLocaleString();gateMessage.textContent='';gateMessage.style.color='#e5b2a5';
+ parkGatePanel.style.display='flex';
+}
+function enterPark(id){
+ const start=parkStartX(id);X=start+1.65;Z=-8.65;th=0;v=0;vx=0;vz=0;vy=0;gvy=0;air=false;grind=null;trick=null;manual=false;state='play';Y=H(X,Z);pit=0;pop=0;keys={};activeParkId=id;cam.position.set(X-cameraDistance,Y+cameraHeight,Z-1.05);
+}
+function confirmParkGate(){
+ if(!parkGateOpen||parkGatePending===null)return;
+ const id=parkGatePending,p=PARK_CATALOG[id];if(!p)return;
+ if(ownedParkIds.includes(id)){parkGateOpen=false;parkGatePanel.style.display='none';parkGatePending=null;enterPark(id);return}
+ if(cash<p.price){gateMessage.style.color='#f0b4a8';gateMessage.textContent='NOT ENOUGH CASH · NEED $'+(p.price-cash).toLocaleString()+' MORE';return}
+ cash-=p.price;ownedParkIds.push(id);saveCash();activeParkId=id;saveParkData();
+ parkGateOpen=false;parkGatePanel.style.display='none';parkGatePending=null;enterPark(id);
+ say('PARK UNLOCKED · '+p.name.toUpperCase()+' · -$'+p.price.toLocaleString(),false);
+}
+function denyParkGate(){if(!parkGateOpen)return;parkGateOpen=false;parkGatePanel.style.display='none';parkGatePending=null;respawn();say('RETURNED TO WORKSHOP STARTER',false)}
+function checkParkGate(){
+ if(parkGateOpen||state!=='play')return;
+ for(let id=1;id<PARK_CATALOG.length;id++){
+  if(ownedParkIds.includes(id))continue;
+  const triggerX=parkStartX(id)+.28;
+  if(X>=triggerX&&X<triggerX+.85){openParkGate(id);return}
+ }
+}
+gateConfirm.addEventListener('click',confirmParkGate);
+document.getElementById('gateDeny').addEventListener('click',denyParkGate);
+parkGatePanel.addEventListener('pointerdown',e=>e.stopPropagation());
+function bail(m){if(state==='bail')return;state='bail';bailT=0;trick=null;grind=null;manual=false;dk.rotation.set(0,0,0);combo={pts:0,n:0,names:[],t:0,m:0};comboMultiplier=1.0;comboLinks=0;
+ if(!air){vx=Math.cos(th)*v;vz=Math.sin(th)*v}vy=Math.max(vy,2.5);air=true;spin={x:(Math.random()-.5)*14,z:(Math.random()-.5)*14};say(m,1)}
+function advanceComboMultiplier(){comboLinks++;comboMultiplier=Math.min(2.0,Math.round((1+comboLinks*.1)*10)/10)}
+function awardCash(base,label,details=''){
+ const usedMultiplier=comboMultiplier;
+ const deckMultiplier=BOARD_CATALOG[currentBoardId].mult;
+ const earned=Math.max(1,Math.round(base*usedMultiplier*deckMultiplier));
+ cash+=earned;saveCash();
+ say(`${label}  +$${earned}  ·  ${usedMultiplier.toFixed(1)}× combo  ·  ${deckMultiplier.toFixed(2)}× deck${details?'  ·  '+details:''}`,false);
+ advanceComboMultiplier();
+ return earned;
+}
+function awardTrickCash(key,spins,smoothness){
+ const item=TR[key];if(!item)return 0;
+ const base=(4+item[1]/34)*(1+.65*Math.max(0,spins-1));
+ const qualityFactor=.65+.75*Math.max(0,Math.min(1,smoothness));
+ const grade=smoothness>=.84?'PERFECT':smoothness>=.62?'CLEAN':'SKETCHY';
+ return awardCash(base*qualityFactor,item[0],grade);
+}
+function awardGrindCash(g,reason){
+ if(!g||g.duration<.12||g.cashEarned<=0)return 0;
+ const base=Math.max(1,g.cashEarned);
+ const duration=g.duration.toFixed(1)+'s';
+ return awardCash(base,g.style.name,`${duration} grind · ${reason}`);
+}
+function bank(){const g=Math.floor(combo.pts*Math.max(1,combo.n));if(g>0){score+=g;say(combo.names.join(' + ')+'  +'+g)}combo={pts:0,n:0,names:[],t:0,m:0};comboMultiplier=1.0;comboLinks=0}
+function ollie(){if(!go||state!=='play')return;
+ if(grind){const g=grind,payout=awardGrindCash(g,'pop out');combo.pts+=Math.round(g.style.rate*.35);combo.names.push('Pop out');grind=null;air=true;vy=3.05;vx=g.r.ux*g.dir*Math.max(2.5,g.gs);vz=g.r.uz*g.dir*Math.max(2.5,g.gs);th=g.targetHeading;pop=.3;say(payout?'POP OUT · +$'+payout:'POP OUT!',false)}
+ else if(!air){air=true;vy=gvy+3.65+Math.min(Math.abs(v),6)*.13;vx=Math.cos(th)*v;vz=Math.sin(th)*v;pop=.3}}
+function trickKey(k,c){if(!go||state!=='play'||trick||grind)return;if(!air)ollie();trick={k,c,t:0,a:0}}
+function endTrick(n){const t=TR[trick.k];combo.pts+=t[1]*n;combo.n++;combo.names.push((n>1?n+'× ':'')+t[0]);trick=null;dk.rotation.set(0,0,0)}
+function chooseGrindStyle(i){if(i<0||i>=GRIND_STYLES.length)return;grindStyleIndex=i;document.getElementById('grindName').textContent=GRIND_STYLES[i].name;say('GRIND: '+GRIND_STYLES[i].name,false)}
+function tryStartGrind(speed){
+ const style=GRIND_STYLES[grindStyleIndex];
+ let best=null;
+ for(const r of RL){
+  // Check the chosen truck/deck contact point against the closest point on this rail.
+  const contactX=X+Math.cos(th)*style.contact;
+  const contactZ=Z+Math.sin(th)*style.contact;
+  const raw=((contactX-r.x0)*r.ux+(contactZ-r.z0)*r.uz)/r.len;
+  const u=Math.max(.045,Math.min(.955,raw));
+  if(raw<.025||raw>.975)continue;
+  const qx=r.x0+r.dx*u,qz=r.z0+r.dz*u;
+  const cross=Math.hypot(contactX-qx,contactZ-qz);
+  if(cross>.48)continue;
+  const railY=r.h0+(r.h1-r.h0)*u;
+  // Y is the wheel-ground reference; the truck contact point is about 0.08 above it.
+  const heightError=Math.abs((Y+.08)-(railY+r.radius));
+  if(heightError>.24||vy>2.2)continue;
+  const alongSpeed=vx*r.ux+vz*r.uz;
+  const acrossSpeed=-vx*r.uz+vz*r.ux;
+  if(Math.abs(alongSpeed)<1.05)continue;
+  if(Math.abs(acrossSpeed)>Math.max(2.9,Math.abs(alongSpeed)*1.15))continue;
+  const dir=alongSpeed>=0?1:-1;
+  const railAngle=Math.atan2(r.uz,r.ux)+(dir<0?Math.PI:0);
+  const targetHeading=railAngle+style.angle;
+  const angleError=Math.abs(angd(th-targetHeading));
+  const allowed=style.align==='perp'?.92:(style.align==='angled'?.88:.82);
+  if(angleError>allowed)continue;
+  const centreX=qx-Math.cos(targetHeading)*style.contact;
+  const centreZ=qz-Math.sin(targetHeading)*style.contact;
+  const centreU=((centreX-r.x0)*r.ux+(centreZ-r.z0)*r.uz)/r.len;
+  if(centreU<.025||centreU>.975)continue;
+  const quality=cross+heightError*.8+angleError*.13+Math.abs(acrossSpeed)*.035;
+  if(!best||quality<best.quality)best={r,u:centreU,qx:centreX,qz:centreZ,railY,dir,alongSpeed,targetHeading,quality};
+ }
+ if(!best)return false;
+ const b=best;
+ grind={r:b.r,dir:b.dir,u:b.u,gs:Math.max(2.1,Math.min(6.2,Math.abs(b.alongSpeed))),style,targetHeading:b.targetHeading,qualityFactor:Math.max(.55,Math.min(1,1-b.quality/1.15)),cashEarned:0,duration:0};
+ X=b.qx;Z=b.qz;Y=b.railY+b.r.radius-.08;vy=0;air=false;th=b.targetHeading;
+ if(trick){trick=null;dk.rotation.set(0,0,0)}
+ combo.names.push(style.name);combo.pts+=Math.round(style.rate*.28);combo.t=1.8;
+ say(style.name.toUpperCase()+' LOCKED!',false);
+ return true;
+}
+const AR={ArrowLeft:'kick',ArrowRight:'heel',ArrowDown:'pop',ArrowUp:'fs'},CB={'heel,kick':'tre','kick,pop':'var','fs,kick':'hard','heel,pop':'inw','fs,heel':'laser'};
+let pend=null;
+function arrow(k,c){if(pend){clearTimeout(pend.id);const t=CB[[pend.k,k].sort().join(',')]||pend.k,cs=[pend.c,c];pend=null;trickKey(t,cs)}else pend={k,c,id:setTimeout(()=>{const p=pend;pend=null;trickKey(p.k,[p.c])},75)}}
+function startGame(){go=1;document.getElementById('st').style.display='none';window.focus();R.domElement.focus()}
+document.getElementById('st').addEventListener('pointerdown',startGame);
+addEventListener('pointerdown',()=>{window.focus()});
+addEventListener('wheel',e=>{if(e.target&&e.target.closest&&e.target.closest('#tl'))return;cameraDistance=Math.max(2.35,Math.min(5.8,cameraDistance+Math.sign(e.deltaY)*.28));e.preventDefault()},{passive:false});
+addEventListener('keydown',e=>{if(shopOpen||parkShopOpen||parkGateOpen||pauseOpen||codePanel.style.display==='flex')return;const c=e.code;if(/^(Arrow|Space)/.test(c))e.preventDefault();if(e.repeat)return;if(!go)startGame();keys[c]=1;
+ if(GRIND_KEYS[c]!==undefined)chooseGrindStyle(GRIND_KEYS[c]);else if(AR[c])arrow(AR[c],c);else if(c==='Space')ollie();else if(c==='KeyR')respawn();else if(LK[c])trickKey(LK[c],[c])});
+addEventListener('keyup',e=>{keys[e.code]=0});
+addEventListener('blur',()=>{keys={}});
+function angd(a){return Math.atan2(Math.sin(a),Math.cos(a))}
+function land(){air=false;vy=0;gvy=0;Y=H(X,Z);const mv=Math.atan2(vz,vx),sp=Math.hypot(vx,vz);let landed=null;
+ if(trick){const p=trick.t/CY,n=Math.round(p),rotationError=Math.abs(p-n);if(n<1||rotationError>.22)return bail(TR[trick.k][3]?'Landed on its side':'Sketchy landing');landed={key:trick.k,spins:n,rotationError};endTrick(n)}
+ const angleError=Math.abs(angd(th-mv));
+ if(sp>1&&angleError>1.05)return bail('Bad landing angle');
+ v=vx*Math.cos(th)+vz*Math.sin(th);pop=0;
+ if(landed){combo.pts+=50;combo.names.push('Clean landing');
+  const rotationSmoothness=1-Math.min(1,landed.rotationError/.22);
+  const lineSmoothness=1-Math.min(1,angleError/1.05);
+  const smoothness=Math.max(0,Math.min(1,rotationSmoothness*.68+lineSmoothness*.32));
+  awardTrickCash(landed.key,landed.spins,smoothness);
+ }}
+let sl=0;
+function step(dt){
+ if(state==='bail'){bailT+=dt;vy-=G*dt;Y+=vy*dt;X+=vx*dt;Z+=vz*dt;const g=Math.max(H(X,Z),-9);if(Y<g){Y=g;vy*=-.35;vx*=.6;vz*=.6}
+  bd.rotation.x+=spin.x*dt;bd.rotation.z+=spin.z*dt;if(bailT>1.5)respawn();return}
+ const st=(keys.KeyD?1:0)-(keys.KeyA?1:0),fx=Math.cos(th),fz=Math.sin(th);
+ if(trick){if(trick.c.some(x=>keys[x]))trick.t+=dt;const p=trick.t/CY,t=TR[trick.k];trick.a+=(p-trick.a)*Math.min(1,14*dt);dk.rotation.set(t[3]*Math.PI*2*trick.a,t[4]*Math.PI*2*trick.a,(t[5]||0)*Math.PI*2*trick.a)}
+ if(grind){
+  const g=grind,r=g.r;
+  g.gs=Math.max(1.25,g.gs-.11*dt);
+  g.u+=g.dir*g.gs*dt/r.len;
+  if(g.u<=.018||g.u>=.982){
+   const end=g.u>=.982?1:0,rx=r.x0+r.dx*end,rz=r.z0+r.dz*end;
+   X=rx-Math.cos(g.targetHeading)*g.style.contact;Z=rz-Math.sin(g.targetHeading)*g.style.contact;
+   Y=r.h0+(r.h1-r.h0)*end+r.radius-.08;const grindPayout=awardGrindCash(g,'rail end');grind=null;air=true;vy=1.15;
+   vx=r.ux*g.dir*Math.max(2.2,g.gs);vz=r.uz*g.dir*Math.max(2.2,g.gs);th=g.targetHeading;
+   say(grindPayout?'RAIL END · +$'+grindPayout:'RAIL END · POP OUT',false);return;
+  }
+  const rx=r.x0+r.dx*g.u,rz=r.z0+r.dz*g.u;
+  X=rx-Math.cos(g.targetHeading)*g.style.contact;Z=rz-Math.sin(g.targetHeading)*g.style.contact;
+  Y=r.h0+(r.h1-r.h0)*g.u+r.radius-.08;vy=0;th+=angd(g.targetHeading-th)*Math.min(1,16*dt);
+  combo.pts+=g.style.rate*dt;g.duration+=dt;g.cashEarned+=(1.25+g.style.rate/105)*g.qualityFactor*dt;
+  sparkClock-=dt;if(sparkClock<=0){spawnSpark(X+(Math.random()-.5)*.18,Y+.10,Z+(Math.random()-.5)*.18);spawnSpark(X+(Math.random()-.5)*.18,Y+.10,Z+(Math.random()-.5)*.18);sparkClock=.055}
+  return;
+ }
+ if(!air){
+  const sp=Math.abs(v);th+=st*(1.4+.6/(1+sp))*dt*(sp>.3?1:.5);
+  if(keys.KeyW)v=Math.min(6,v+5*dt);if(keys.KeyS)v=Math.max(-2,v-8*dt);v*=1-.25*dt;
+  sl=(H(X+fx*.1,Z+fz*.1)-H(X-fx*.1,Z-fz*.1))/.2;if(sl<-5||sl>5)sl=0;v-=G*sl/Math.sqrt(1+sl*sl)*dt;
+  manual=!!(keys.KeyC||keys.ShiftLeft)&&Math.abs(v)>1.2;
+  if(manual){combo.pts+=70*dt;if(!combo.m){combo.m=1;combo.names.push('Manual')}}else combo.m=0;
+  const nx=X+fx*v*dt,nz=Z+fz*v*dt,gh=H(nx,nz);
+  if(gh-Y>.12+Math.abs(v)*dt*2.2&&gh>=0){if(Math.abs(v)>3)return bail('Slammed into it');v*=-.3}
+  else{X=nx;Z=nz;const yb=Y+gvy*dt-.5*G*dt*dt;
+   if(gh<yb-.003&&Math.abs(v)>.4){air=true;vy=Math.max(-8,Math.min(12,gvy));vx=fx*v;vz=fz*v}
+   else{gvy=Math.max(-12,Math.min(12,(gh-Y)/dt));Y=gh}}
+ }else{
+  th+=st*2.6*dt;vy-=G*dt;const sp=Math.hypot(vx,vz);
+  if(sp>.3){const ux=vx/sp,uz=vz/sp,hf=H(X+ux*.12,Z+uz*.12);if(hf>=0&&hf-H(X,Z)>.25&&Y<hf-.04){if(sp>2.5)return bail('Hit it');vx*=-.3;vz*=-.3}}
+  X+=vx*dt;Z+=vz*dt;Y+=vy*dt;
+  if(!tryStartGrind(sp)){const gh=H(X,Z);if(Y<=gh&&vy<=0&&gh>-1)land();else if(Y<-4)bail('Fell off the desk')}
+ }
+ if(air||grind||manual)combo.t=1.5;else if(combo.pts>0){combo.t-=dt;if(combo.t<=0)bank()}
+ checkParkGate();
+}
+const sv=document.getElementById('sv'),cashVal=document.getElementById('cashVal'),multVal=document.getElementById('multVal'),spdVal=document.getElementById('spdVal'),cb=document.getElementById('cb'),tm=document.getElementById('tm'),tf=document.getElementById('tf'),lis=[...document.querySelectorAll('#tl li[data-k]')],grindLis=[...document.querySelectorAll('#tl li[data-g]')];
+const railState=document.getElementById('railState');
+function updateRailStatus(){
+ if(grind){railState.textContent='LOCKED · '+grind.style.name.toUpperCase()+' · +$'+Math.floor(grind.cashEarned*comboMultiplier);return}
+ let near=false;
+ for(const r of RL){const u=Math.max(0,Math.min(1,((X-r.x0)*r.ux+(Z-r.z0)*r.uz)/r.len));const px=r.x0+r.dx*u,pz=r.z0+r.dz*u;const d=Math.hypot(X-px,Z-pz);const rh=r.h0+(r.h1-r.h0)*u;const dy=Math.abs((Y+.08)-(rh+r.radius));if(d<.78&&dy<.72){near=true;break}}
+ let bn=99;for(const bowl of P){if(bowl.t==='bowl')bn=Math.min(bn,Math.hypot((X-bowl.x)/bowl.rx,(Z-bowl.z)/bowl.rz))}railState.textContent=near?(air?'LINE UP · LAND ON RAIL':'OLLIE TO LOCK'):(bn<.98?(air?'BOWL · AIRBORNE':'BOWL · RIDE THE TRANSITION'):(air?'AIRBORNE':'FIND A RAIL'));
+}
+
+// Pause menu and portable save backups.
+let pauseOpen=false;
+const pausePanel=document.getElementById('pausePanel');
+const saveMessage=document.getElementById('saveMessage');
+function openPause(){
+ if(!go || shopOpen || parkShopOpen || parkGateOpen || codePanel.style.display==='flex')return;
+ pauseOpen=true;keys={};pausePanel.style.display='flex';saveMessage.textContent='Cash, boards, parks and redeemed codes are included in your backup.';
+}
+function closePause(){pauseOpen=false;pausePanel.style.display='none';keys={};}
+function buildSavePayload(){return {
+ game:'fingerboard-park-save',version:1,savedAt:new Date().toISOString(),
+ cash:Math.max(0,Math.floor(cash)),ownedBoardIds:ownedBoardIds.slice(),currentBoardId,
+ ownedParkIds:ownedParkIds.slice(),activeParkId:parkAtX(X),redeemedCodes:redeemedCodes.slice()
+ };}
+function exportSaveFile(){
+ try{
+  const blob=new Blob([JSON.stringify(buildSavePayload(),null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='fingerboard-park-save.json';document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  saveMessage.textContent='SAVE EXPORTED · Move fingerboard-park-save.json to your other computer.';
+ }catch(err){saveMessage.textContent='Could not export the save in this browser.';}
+}
+function importSaveFile(file){
+ if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   const data=JSON.parse(String(reader.result||''));
+   if(!data || data.game!=='fingerboard-park-save' || data.version!==1)throw new Error('That is not a supported Fingerboard Park save file.');
+   if(!Number.isFinite(Number(data.cash)) || Number(data.cash)<0)throw new Error('The wallet amount is invalid.');
+   const boards=Array.isArray(data.ownedBoardIds)?data.ownedBoardIds.map(Number).filter(n=>Number.isInteger(n)&&n>=0&&n<BOARD_CATALOG.length):[0];
+   const parks=Array.isArray(data.ownedParkIds)?data.ownedParkIds.map(Number).filter(n=>Number.isInteger(n)&&n>=0&&n<PARK_CATALOG.length):[0];
+   ownedBoardIds=[...new Set([0,...boards])];
+   currentBoardId=Number.isInteger(Number(data.currentBoardId))&&ownedBoardIds.includes(Number(data.currentBoardId))?Number(data.currentBoardId):0;
+   ownedParkIds=[...new Set([0,...parks])];
+   cash=Math.min(1000000000000,Math.floor(Number(data.cash)));
+   redeemedCodes=Array.isArray(data.redeemedCodes)?[...new Set(data.redeemedCodes.map(v=>String(v).toLowerCase()).filter(v=>v.length<=40))]:[];
+   saveCash();saveBoardData();saveParkData();
+   try{localStorage.setItem('fingerboardParkRedeemedCodes',JSON.stringify(redeemedCodes))}catch(e){}
+   applyBoard(currentBoardId);renderShop();renderParkShop();respawn();
+   saveMessage.textContent='SAVE IMPORTED · Your wallet, boards and parks have been restored.';
+  }catch(err){saveMessage.textContent='IMPORT FAILED · '+(err&&err.message?err.message:'Invalid save file');}
+ };
+ reader.onerror=()=>{saveMessage.textContent='Could not read that save file.'};
+ reader.readAsText(file);
+}
+document.getElementById('pauseBtn').addEventListener('click',openPause);
+document.getElementById('resumeBtn').addEventListener('click',closePause);
+document.getElementById('pauseCloseBtn').addEventListener('click',closePause);
+document.getElementById('exportSaveBtn').addEventListener('click',exportSaveFile);
+document.getElementById('importSaveBtn').addEventListener('click',()=>document.getElementById('saveFileInput').click());
+document.getElementById('saveFileInput').addEventListener('change',e=>{importSaveFile(e.target.files&&e.target.files[0]);e.target.value=''});
+document.getElementById('fullscreenBtn').addEventListener('click',()=>{
+ try{if(!document.fullscreenElement){const p=document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(()=>{saveMessage.textContent='Fullscreen is not available in this browser.'})}else if(document.exitFullscreen)document.exitFullscreen()}
+ catch(e){saveMessage.textContent='Fullscreen is not available in this browser.'}
+});
+pausePanel.addEventListener('pointerdown',e=>{if(e.target===pausePanel)closePause();e.stopPropagation()});
+addEventListener('keydown',e=>{
+ if(e.code==='Escape'&&!shopOpen&&!parkShopOpen&&!parkGateOpen&&codePanel.style.display!=='flex'){
+  if(pauseOpen)closePause();else openPause();e.preventDefault();
+ }
+});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&go&&!pauseOpen)openPause()});
+
+let last=performance.now();
+function loop(n){const dt=Math.min((n-last)/1000,.04);last=n;
+ if(go&&!shopOpen&&!parkShopOpen&&!parkGateOpen&&!pauseOpen&&codePanel.style.display!=='flex'){step(dt/2);step(dt/2)}
+ bd.position.set(X,Y+.12,Z);sun.target.position.set(X,0,Z);sun.position.set(X+6,14,Z+5);
+ if(state==='play'){bd.rotation.y=-th;
+  const pt=air?Math.max(-.35,Math.min(.35,vy/12))+(pop>0?.2:0):Math.atan(sl)+(manual?.38:0);pit+=(pt-pit)*Math.min(1,12*dt);bd.rotation.z=grind?grind.style.pitch:pit;bd.rotation.x=grind?grind.style.roll:0;if(pop>0)pop-=dt}
+ let d=angd(th-ct);ct+=d*Math.min(1,2.5*dt);
+ cam.position.lerp(new T.Vector3(X-Math.cos(ct)*cameraDistance+Math.sin(ct)*1.0,Y+cameraHeight,Z-Math.sin(ct)*cameraDistance-Math.cos(ct)*1.0),Math.min(1,5.2*dt));cam.lookAt(X+Math.cos(ct)*.24,Y+.19,Z+Math.sin(ct)*.24);
+ sv.textContent=Math.floor(score);cashVal.textContent='$'+Math.floor(cash).toLocaleString();multVal.textContent=comboMultiplier.toFixed(1)+'×';activeParkId=parkAtX(X);const parkBtnLabel='PARK MAP';if(parkShopBtn.textContent!==parkBtnLabel)parkShopBtn.textContent=parkBtnLabel;
+ for(const li of lis)li.classList.toggle('on',!!trick&&li.dataset.k===trick.k);for(const li of grindLis)li.classList.toggle('gon',li.dataset.g===String(grindStyleIndex));
+ hnd.visible=state==='play';const handLift=(trick||grind)?0.12:0;hnd.position.y+=(handLift-hnd.position.y)*Math.min(1,14*dt);
+ const boardSpeed=air?Math.hypot(vx,vz):Math.abs(v);for(const w of wheelMeshes)w.rotateZ(boardSpeed*dt*4.2);
+ spdVal.textContent=boardSpeed.toFixed(1);updateRailStatus();
+ if(trick&&air&&go){tm.style.opacity=1;tf.style.width=(Math.min(1,(trick.t%CY)/CY)*100)+'%'}else{tm.style.opacity=0;tf.style.width='0%'}
+ cb.textContent=combo.pts>0?combo.names.join(' + ')+'  '+Math.floor(combo.pts*Math.max(1,combo.n)):'';
+ updateSparks(dt);R.render(S,cam);requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+</script></body></html>
